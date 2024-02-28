@@ -152,7 +152,7 @@ def home():
     for i in all_todos:
         # to separate user's items
         if i.user_id == current_user.id:
-            if f'{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}' == f'{CURRENT_YEAR}-{CURRENT_MONTH}':
+            if f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" == f"{CURRENT_YEAR}-{CURRENT_MONTH}":
                 todo_date.append(i.due_date)
 
                 # to get rid of duplicat dates
@@ -161,7 +161,7 @@ def home():
     for i in all_dones:
         # to separate user's items
         if i.user_id == current_user.id:
-            if f'{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}' == f'{CURRENT_YEAR}-{CURRENT_MONTH}':
+            if f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" == f"{CURRENT_YEAR}-{CURRENT_MONTH}":
                 done_date.append(i.due_date)
 
                 # to get rid of duplicat dates
