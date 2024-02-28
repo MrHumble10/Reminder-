@@ -27,8 +27,8 @@ CURRENT_YEAR = "".join(TODAY).split('-')[0]
 EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = '123456789'
-# os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
 
@@ -135,12 +135,12 @@ def login():
             return redirect(url_for('home'))
     return render_template('login.html', logged_in=current_user.is_authenticated)
 nothing_for_this_month = False
-
+all_years = []
 @app.route("/home", methods=["GET", "POST"])
 def home():
 
-    global nothing_for_this_month, EMAIL_SENT_DATE
-    all_years = []
+    global nothing_for_this_month, EMAIL_SENT_DATE, all_years
+
     unique_todo_date = []
     unique_done_date = []
     todo_date = []
@@ -222,8 +222,8 @@ def home():
 
 @app.route("/year<int:year>", methods=["GET", "POST"])
 def years(year):
+    global all_years
     all_is_done = False
-    all_years = []
     unique_todo_date = []
     unique_done_date = []
     todo_date = []
@@ -256,16 +256,7 @@ def years(year):
     # if done_date:
     #     unique_done_date.sort(key=lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
 
-# to sort years
-    for date in unique_todo_date:
-        year = "".join(date).split('-')[0]
-        all_years.append(year)
-    all_years = list(set(all_years))
 
-    for date in unique_done_date:
-        year = "".join(date).split('-')[0]
-        all_years.append(year)
-    all_years = list(set(all_years))
     # on condition that there is not any date it means there is noting to do
     if not todo_date :
         no_date = True
@@ -281,7 +272,7 @@ def years(year):
     return render_template('years.html', todos=all_todos, dones=all_dones,
                            user=current_user, unique_done_date=sorted(list(set(unique_done_date))),
                            unique_todo_date=sorted(list(set(unique_todo_date))),
-                           today=TODAY, no_date=no_date, all_is_done=all_is_done, years=sorted(all_years),
+                           today=TODAY, no_date=no_date, all_is_done=all_is_done, years=sorted(list(set(all_years))),
                            selected_year=request.url.split('year')[-1], current_month=dt.datetime.now().strftime("%B"),
                            datetime=dt.datetime)
 
@@ -344,7 +335,7 @@ def tables():
 
 @app.route("/add", methods=["GET", "POST"])
 def new_todo():
-
+    global all_years
     if request.method == 'POST':
         title = request.form['todo']
         is_unique = db.session.execute(db.select(Todos).where(Todos.title == title)).scalar()
@@ -368,7 +359,8 @@ def new_todo():
         else:
             flash('Fill the form please!!!')
             return redirect(url_for('new_todo'))
-    return render_template('add_todo.html')
+
+    return render_template('add_todo.html', years=sorted(list(set(all_years))))
 
 @app.route("/done", methods=["GET", "POST"])
 def dones(item):
