@@ -27,7 +27,8 @@ CURRENT_YEAR = "".join(TODAY).split('-')[0]
 EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = '123456789'
+# os.environ.get('SECRET_KEY')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
 
