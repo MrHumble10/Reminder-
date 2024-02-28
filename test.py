@@ -88,7 +88,7 @@ def register():
         flash('You need to log out to access the register page')
         return redirect(url_for('home'))
 
-    psw_hashed_with_salt = generate_password_hash(f"{request.form.get("pswd")}",
+    psw_hashed_with_salt = generate_password_hash(f"{request.form.get('pswd')}",
                                                   method='pbkdf2:sha256',
                                                   salt_length=8,
                                                   )
