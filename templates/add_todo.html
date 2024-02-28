@@ -39,7 +39,7 @@
         <input name="info" hidden="hidden" id="myInput">
         <input name="todo" hidden="hidden" id="myInput2">
     <fieldset >
-        On, <input name="date" class="no-outline" type="date" required  value="{{edit_form.due_date}}">
+        <p>On, <input name="date" class="no-outline" type="date" required  value="{{edit_form.due_date}}"></p>
         <p>I'm going to <span id="span_Id" class="form__field field--name" data-placeholder="Subject" tabindex="1" contenteditable>{{edit_form.info}}</span>.</p>
         <p>I need to <span id="span_Id2" class="form__field field--email" data-placeholder="Todo" tabindex="3" contenteditable>{{edit_form.title}}</span>.</p>
         <p>I will do it perfectly. Cheers!</p>
@@ -58,11 +58,11 @@
     </fieldset>
 </form>
     {%else%}
-<form class="form__contact " action="{{url_for('new_todo')}}" method="POST" onsubmit="return handleFormSubmit()" style="position:absolute">
+<form class="form__contact " action="{{url_for('new_todo')}}" method="POST" onsubmit="return handleFormSubmit()">
     <input name="info" hidden="hidden" id="myInput">
     <input name="todo" hidden="hidden" id="myInput2">
     <fieldset >
-        <p>On, <input name="date" class="no-outline" type="date" required style="position:relative;"></p>
+        <p>On, <input name="date" class="no-outline" type="date" required ></p>
         <p>I'm going to <span id="span_Id" class="form__field field--name" data-placeholder="Subject" tabindex="1" contenteditable></span>.</p>
         <p>I need to <span id="span_Id2" class="form__field field--email" data-placeholder="Todo" tabindex="3" contenteditable></span>.</p>
         <p>I will do it perfectly. Cheers!</p>
