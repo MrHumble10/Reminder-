@@ -153,12 +153,11 @@ svg {
 .form__contact input[type="date"] {
     border: 0;
     outline: 0;
-    width: 3.4cm;
+    width: 3.5cm;
     background: transparent;
+    position:relative;
     color: #38419D;
-    display: inline;
     color: #B31312;
-    outline: none;
 }
 
 }
