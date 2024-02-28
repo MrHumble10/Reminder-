@@ -37,9 +37,9 @@ import os
 
 def send_email(user_name, user_email, tel, msg):
     # os.environ.get("MJ_APIKEY_PRIVATE")
-    MJ_APIKEY_PRIVATE = '3989ddb697e3f2feb9950571f17b79dd'
+    MJ_APIKEY_PRIVATE = os.environ.get("MJ_APIKEY_PRIVATE")
     # os.environ.get("MJ_APIKEY_PUBLIC")
-    MJ_APIKEY_PUBLIC = '51045e3e145ebe22953a762762d80622'
+    MJ_APIKEY_PUBLIC = os.environ.get("MJ_APIKEY_PUBLIC")
 
 
     mailjet = Client(auth=(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE), version='v3.1')
