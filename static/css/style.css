@@ -159,6 +159,11 @@ svg {
     color: #B31312;
     outline: none;
 }
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
 
 }
 
