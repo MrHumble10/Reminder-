@@ -1,0 +1,115 @@
+{%include 'header.html'%}
+
+<style>
+
+
+    .protest-riot-regular {
+  font-family: "Protest Riot", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color:#38419D;
+}
+
+</style>
+
+
+<link rel="stylesheet" href="./static/css/style.css">
+
+<div class="wrapper" >
+
+
+<div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <p class='flashes my-3' style="font-size:30px;font-weight: bold;color:green; text-align:center">{{ message }}</p>
+          {% endfor %}
+       {% endif %}
+    {% endwith %}
+</div>
+    {%if is_detail%}
+    <h2 class="my-4  protest-riot-regular" style="position:relative">Your plane detail</h2>
+    {%elif is_edit%}
+    <h2 class="my-4  protest-riot-regular" style="position:relative">Edit your plane</h2>
+    {%else%}
+<h2 class="my-4  protest-riot-regular" style="position:relative">What are you up to do?</h2>
+    {%endif%}
+                {%if is_edit%}
+    <form class="form__contact " action="{{url_for('edit',item_id=item.id)}}" method="POST" onsubmit="return handleFormSubmit()" style="position:absolute">
+        <input name="info" hidden="hidden" id="myInput">
+        <input name="todo" hidden="hidden" id="myInput2">
+    <fieldset >
+        <p>On, <input name="date" class="no-outline" type="date" required  value="{{edit_form.due_date}}"></p>
+        <p>I'm going to <span id="span_Id" class="form__field field--name" data-placeholder="Subject" tabindex="1" contenteditable>{{edit_form.info}}</span>.</p>
+        <p>I need to <span id="span_Id2" class="form__field field--email" data-placeholder="Todo" tabindex="3" contenteditable>{{edit_form.title}}</span>.</p>
+        <p>I will do it perfectly. Cheers!</p>
+        <button type="submit" class="button button--xlarge" tabindex="4">Submit To-Do »</button>
+    </fieldset>
+</form>
+            {%elif is_detail%}
+    <form class="form__contact " action="{{url_for('details',item_id=item.id)}}" method="POST" onsubmit="return handleFormSubmit()" style="position:absolute">
+        <input name="info" hidden="hidden" id="myInput">
+        <input name="todo" hidden="hidden" id="myInput2">
+    <fieldset>
+        <p>On, <input name="date" class="no-outline" type="date" required  value="{{detail.due_date}}" disabled></p>
+        <p>I'm going to {{detail.info}}.</p>
+        <p>I need to {{detail.title}}.</p>
+        <p>I will do it perfectly. Cheers!</p>
+    </fieldset>
+</form>
+    {%else%}
+<form class="form__contact " action="{{url_for('new_todo')}}" method="POST" onsubmit="return handleFormSubmit()" style="position:absolute">
+    <input name="info" hidden="hidden" id="myInput">
+    <input name="todo" hidden="hidden" id="myInput2">
+    <fieldset >
+        <p>On, <input name="date" class="no-outline" type="date" required ></p>
+        <p>I'm going to <span id="span_Id" class="form__field field--name" data-placeholder="Subject" tabindex="1" contenteditable></span>.</p>
+        <p>I need to <span id="span_Id2" class="form__field field--email" data-placeholder="Todo" tabindex="3" contenteditable></span>.</p>
+        <p>I will do it perfectly. Cheers!</p>
+        <button type="submit" class="button button--xlarge" tabindex="4">Submit To-Do »</button>
+    </fieldset>
+</form>
+{%endif%}
+
+<script>
+    function handleFormSubmit() {
+        // Extract the value from the <span>
+        const spanValue1 = document.getElementById("span_Id").textContent;
+        const spanValue2 = document.getElementById("span_Id2").textContent;
+
+        // Set the value in the <input> field (assuming you have an input with ID "myInput")
+        document.getElementById("myInput").value = spanValue1;
+
+        // Set the value in the <input> field (assuming you have an input with ID "myInput2")
+        document.getElementById("myInput2").value = spanValue2;
+        // You can perform additional form validation or other actions here if needed
+        // Return true to allow form submission or false to prevent it
+        return true;
+    }
+</script>
+
+
+
+
+</div>
+
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+  <defs>
+    <filter id="blur0">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0 0" />
+    </filter>
+    <filter id="blur1">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0 5" />
+    </filter>
+    <filter id="blur2">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0 10" />
+    </filter>
+    <filter id="blur3">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0 15" />
+    </filter>
+    <filter id="blur4">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0 20" />
+    </filter>
+  </defs>
+</svg>
+{%include 'footer.html'%}
