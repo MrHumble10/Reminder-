@@ -15,7 +15,6 @@ import datetime as dt
 from datetime import timedelta
 import calendar
 TODAY = str(dt.datetime.now().strftime('%Y-%m-%d'))
-print(TODAY)
 
 TOMORROW = dt.datetime.now() + timedelta(days=1)
 CURRENT_MONTH = "".join(TODAY).split('-')[1]
@@ -41,6 +40,46 @@ ckeditor = CKEditor(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+def nav_year():
+    all_years = []
+    unique_todo_date = []
+    unique_done_date = []
+    todo_date = []
+    done_date = []
+    result = db.session.execute(db.select(Todos))
+    all_todos = result.scalars().all()
+    result = db.session.execute(db.select(Done))
+    all_dones = result.scalars().all()
+
+    for i in all_todos:
+        # to seperate user's items
+        if i.user_id == current_user.id:
+            todo_date.append(i.due_date)
+
+            # to get rid of duplicat dates
+            unique_todo_date = list(set(todo_date))
+
+    for i in all_dones:
+        # to separate user's items
+        if i.user_id == current_user.id:
+            done_date.append(i.due_date)
+
+            # to get rid of duplicat dates
+            unique_done_date = list(set(done_date))
+
+    # to sort years
+    for date in unique_todo_date:
+        year = "".join(date).split('-')[0]
+        all_years.append(year)
+    all_years = list(set(all_years))
+
+    for date in unique_done_date:
+        year = "".join(date).split('-')[0]
+        all_years.append(year)
+    all_years = list(set(all_years))
+    return sorted(list(set(all_years)))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -134,13 +173,14 @@ def login():
             login_user(user)
             return redirect(url_for('home'))
     return render_template('login.html', logged_in=current_user.is_authenticated)
-nothing_for_this_month = False
-all_years = []
+
+
 @app.route("/home", methods=["GET", "POST"])
 def home():
 
-    global nothing_for_this_month, EMAIL_SENT_DATE, all_years
-
+    global EMAIL_SENT_DATE
+    nothing_for_this_month = False
+    all_years = []
     unique_todo_date = []
     unique_done_date = []
     todo_date = []
@@ -222,7 +262,7 @@ def home():
 
 @app.route("/year<int:year>", methods=["GET", "POST"])
 def years(year):
-    global all_years
+    all_years = []
     all_is_done = False
     unique_todo_date = []
     unique_done_date = []
@@ -256,19 +296,26 @@ def years(year):
     # if done_date:
     #     unique_done_date.sort(key=lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
 
+# to sort years
+    for date in unique_todo_date:
+        year = "".join(date).split('-')[0]
+        all_years.append(year)
+    all_years = list(set(all_years))
 
+    for date in unique_done_date:
+        year = "".join(date).split('-')[0]
+        all_years.append(year)
+    all_years = list(set(all_years))
     # on condition that there is not any date it means there is noting to do
     if not todo_date :
         no_date = True
     else:
         no_date = False
-    print(no_date)
 
     if not all_todos and not all_dones:
         pass
     elif not all_todos:
         all_is_done = True
-
     return render_template('years.html', todos=all_todos, dones=all_dones,
                            user=current_user, unique_done_date=sorted(list(set(unique_done_date))),
                            unique_todo_date=sorted(list(set(unique_todo_date))),
@@ -292,11 +339,9 @@ app.jinja_env.filters['month_name'] = month_name
 
 @app.route("/todo<int:item_id>", methods=["GET", "POST"])
 def add_to_done(item_id):
-    print(item_id)
     selected_todo = db.get_or_404(Todos, item_id)
     checked_id = selected_todo.id
 
-    print(f"checked id == {checked_id}")
     selected_todo = db.get_or_404(Todos, checked_id)
     dones(selected_todo)
     db.session.delete(selected_todo)
@@ -335,7 +380,6 @@ def tables():
 
 @app.route("/add", methods=["GET", "POST"])
 def new_todo():
-    global all_years
     if request.method == 'POST':
         title = request.form['todo']
         is_unique = db.session.execute(db.select(Todos).where(Todos.title == title)).scalar()
@@ -350,7 +394,6 @@ def new_todo():
                 title=request.form['todo'][0].capitalize() + request.form['todo'][1:],
             )
             db.session.add(new_todo)
-            print(new_todo.due_date)
             if new_todo.due_date < TODAY:
                 flash('Date should be set for following days')
                 return redirect(url_for('new_todo'))
@@ -360,7 +403,7 @@ def new_todo():
             flash('Fill the form please!!!')
             return redirect(url_for('new_todo'))
 
-    return render_template('add_todo.html', years=sorted(list(set(all_years))))
+    return render_template('add_todo.html', years=sorted(list(set(nav_year()))))
 
 @app.route("/done", methods=["GET", "POST"])
 def dones(item):
@@ -405,7 +448,7 @@ def edit(item_id):
         item.title = request.form['todo'][0].capitalize() + request.form['todo'][1:]
         db.session.commit()
         return redirect(url_for('home', item_id=item.id))
-    return render_template('add_todo.html', item=item, is_edit=True, edit_form=edit_todo)
+    return render_template('add_todo.html', item=item, is_edit=True, edit_form=edit_todo, years=sorted(list(set(nav_year()))))
 
 
 @app.route("/details<int:item_id>", methods=["GET", "POST"])
@@ -416,7 +459,7 @@ def details(item_id):
         info=item.info,
         title=item.title,
     )
-    return render_template('add_todo.html', item=item, is_detail=True, detail=detail)
+    return render_template('add_todo.html', item=item, is_detail=True, detail=detail, years=sorted(list(set(nav_year()))))
 
 
 @app.route("/edit-info<int:item_id>", methods=["GET", "POST"])
