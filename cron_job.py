@@ -3,7 +3,9 @@ from test import app, db, Todos, User, TOMORROW
 from collections import Counter
 
 with app.app_context():
-    result = db.session.execute(db.select(Todos))
+
+    db.create_all()
+result = db.session.execute(db.select(Todos))
     all_todos = result.scalars().all()
     tomorrow_todos = []
     for date in all_todos:
@@ -25,7 +27,5 @@ with app.app_context():
                                                 """
             print(f"{user.id}-{todo_title}")
             send_email(user.username, user.email, user.tel, msg=todo_title)
-    db.create_all()
-
 if __name__ == "__main__":
     app.run(port=5002, debug=True)
