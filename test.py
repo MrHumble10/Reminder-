@@ -170,7 +170,6 @@ def admin_email():
     #  preparing title to send to log in user
     if tomorrow_todos:
         todo_title = ''
-        users = []
         for item in tomorrow_todos:
             user = db.get_or_404(User, item.user_id)
 
@@ -178,8 +177,7 @@ def admin_email():
             todo_title = f"""
                                                     <li class="mb-2">{item.info}.</li>
                                                 """
-            print(f"{user.id}-{todo_title}")
-            send_email(user.username, user.email, user.tel, msg=todo_title)
+            send_email(user.username, user.email, user.tel, msg=todo_title, item_id=item.id)
 
 
 @app.route("/", methods=["GET", "POST"])
