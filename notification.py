@@ -1,4 +1,5 @@
 from mailjet_rest import Client
+from flask import Flask, render_template, redirect, url_for, request, flash, abort
 import os
 # def reply_mail(name, email):
 #     MJ_APIKEY_PRIVATE = '3989ddb697e3f2feb9950571f17b79dd'
@@ -62,7 +63,7 @@ def send_email(user_name, user_email, tel, msg, item_id):
                             f"<p>You have already sat plan(s) for tomorrow.</p>"
                             f"<p>This Email has been sent to you "
                             f"in order to remember what you are going to do by Tomorrow.</p>"
-                            f"<p>To know more details <a href='reminder-h4wv.onrender.com/details{item_id}'>Click here</a>."
+                            f"<p>To know more details <a href='{url_for('details', item_id=item_id)}'>Click here</a>."
                             f"""<div class="container py-5">
                             <!-- For demo purpose -->
                             <header class="text-center text-white">
