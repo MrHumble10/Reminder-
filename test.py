@@ -1,19 +1,17 @@
 
 from flask import Flask, render_template, redirect, url_for, request, flash, abort
-from flask_ckeditor import CKEditor
+# from flask_ckeditor import CKEditor
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user
 from notification import send_email
-from functools import wraps
-from flask_gravatar import Gravatar
 import os
-import time
-from flask_bootstrap import Bootstrap5
+# from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc, asc, exc
 import datetime as dt
 from datetime import timedelta
 import calendar
+from collections import Counter
+
 TODAY = str(dt.datetime.now().strftime('%Y-%m-%d'))
 
 TOMORROW = dt.datetime.now() + timedelta(days=1)
@@ -29,14 +27,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
 
-Bootstrap5(app)
+# Bootstrap5(app)
 
 db = SQLAlchemy()
 db.init_app(app)
 
-ckeditor = CKEditor(app)
+# ckeditor = CKEditor(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -117,7 +116,9 @@ class User(UserMixin, db.Model):
 
 
 with app.app_context():
+
     db.create_all()
+
 
 
 
@@ -172,6 +173,30 @@ def login():
         else:
             login_user(user)
             return redirect(url_for('home'))
+
+    result = db.session.execute(db.select(Todos))
+    all_todos = result.scalars().all()
+    tomorrow_todos = []
+    for date in all_todos:
+        if date.due_date == TOMORROW.strftime('%Y-%m-%d'):
+            tomorrow_todos = db.session.execute(
+                db.select(Todos).where(Todos.due_date == TOMORROW.strftime('%Y-%m-%d'))).scalars().all()
+    print(tomorrow_todos)
+
+    #  preparing title to send to log in user
+    if tomorrow_todos:
+        todo_title = ''
+        users = []
+        for item in tomorrow_todos:
+            user = db.get_or_404(User, item.user_id)
+
+            # todo_title is in html because email message is in html format\.
+            todo_title = f"""
+                                                <li class="mb-2">{item.info}.</li>
+                                            """
+            print(f"{user.id}-{todo_title}")
+            send_email(user.username, user.email, user.tel, msg=todo_title)
+
     return render_template('login.html', logged_in=current_user.is_authenticated)
 
 
@@ -179,7 +204,7 @@ def login():
 def home():
 
     global EMAIL_SENT_DATE
-    nothing_for_this_month = False
+
     all_years = []
     unique_todo_date = []
     unique_done_date = []
@@ -216,20 +241,22 @@ def home():
         unique_done_date.sort(key=lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
 
     tomorrow_todos = []
+    x = []
+    nothing_for_this_month = ''
     for date in all_todos:
         if date.user_id == current_user.id:
             if date.due_date == TOMORROW.strftime('%Y-%m-%d'):
                 tomorrow_todos = db.session.execute(
                     db.select(Todos).where(Todos.due_date == TOMORROW.strftime('%Y-%m-%d'))).scalars().all()
+            x.append(f'{"".join(date.due_date).split("-")[0]}-{"".join(date.due_date).split("-")[1]}')
 
-            # on condition that there is not any date it means there is noting to do
-            if not f'{"".join(date.due_date).split("-")[0]}-{"".join(date.due_date).split("-")[1]}' == f'{CURRENT_YEAR}-{CURRENT_MONTH}':
-                nothing_for_this_month = True
-            else:
-                nothing_for_this_month = False
+
 
             year = "".join(date.due_date).split('-')[0]
             all_years.append(year)
+# on condition that there is not any date it means there is noting to do
+    if not f'{CURRENT_YEAR}-{CURRENT_MONTH}' in x:
+        nothing_for_this_month = True
     # preparing title to send to log in user
     if tomorrow_todos:
         todo_title = ''
@@ -243,7 +270,7 @@ def home():
         if not EMAIL_SENT_DATE == TODAY:
             EMAIL_SENT_DATE = TODAY
 
-            send_email(current_user.username, current_user.email, current_user.tel, msg=todo_title)
+            # send_email(current_user.username, current_user.email, current_user.tel, msg=todo_title)
 
     else:
         pass
@@ -316,6 +343,29 @@ def years(year):
         pass
     elif not all_todos:
         all_is_done = True
+
+
+
+    # with app.app_context():
+    #     # sending email if there is date of tomorrow in Todo
+    #     result = db.session.execute(db.select(Todos))
+    #     all_todos = result.scalars().all()
+    #     items_for_tomorrow = [todo for todo in all_todos if todo.due_date == TOMORROW.strftime('%Y-%m-%d')]
+    #     items = []
+    #     for item in items_for_tomorrow:
+    #         user = db.get_or_404(User, item.user_id)
+    #         if user.id == item.user_id:
+    #             items.append(item.user_id)
+    #     print(items)
+
+        # email_counts = Counter(emails)
+        # # Print the results
+        # for email, count in email_counts.items():
+        #     print(f"{email} ({count})")
+
+        # db.create_all()
+
+
     return render_template('years.html', todos=all_todos, dones=all_dones,
                            user=current_user, unique_done_date=sorted(list(set(unique_done_date))),
                            unique_todo_date=sorted(list(set(unique_todo_date))),
@@ -364,19 +414,6 @@ def d(the_id):
     db.session.delete(item_to_del)
     db.session.commit()
     return redirect(url_for('years', year="".join(item.due_date).split('-')[0]))
-
-
-@app.route("/charts")
-def charts():
-    return render_template('charts.html')
-
-@app.route("/401")
-def error_401():
-    return render_template('401.html')
-
-@app.route("/tables")
-def tables():
-    return render_template('tables.html')
 
 @app.route("/add", methods=["GET", "POST"])
 def new_todo():
@@ -499,6 +536,11 @@ def del_favorite(fav_id):
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+
+
+
 
 
 if __name__ == "__main__":
