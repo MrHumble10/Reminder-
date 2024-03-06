@@ -24,9 +24,9 @@ CURRENT_YEAR = "".join(TODAY).split('-')[0]
 EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = '123456789'
 
-
+# os.environ.get('SECRET_KEY')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
 
@@ -156,7 +156,7 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/email123456789", methods=["GET", "POST"])
+@app.route("/email123456789")
 def admin_email():
     result = db.session.execute(db.select(Todos))
     all_todos = result.scalars().all()
@@ -178,6 +178,7 @@ def admin_email():
                                                     <li class="mb-2">{item.info}.</li>
                                                 """
             send_email(user.username, user.email, user.tel, msg=todo_title, item_id=item.id)
+    return render_template('login.html')
 
 
 @app.route("/", methods=["GET", "POST"])
