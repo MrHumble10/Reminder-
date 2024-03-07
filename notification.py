@@ -48,7 +48,7 @@ def send_email(user_name, user_email, tel, msg, item_id):
         'Messages': [
             {
                 "From": {
-                    "Email": "humble.py2017@gmail.com",
+                    "Email": "humble.py.test@gmail.com",
                     "Name": "Me"
                 },
                 "To": [
