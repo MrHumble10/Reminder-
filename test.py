@@ -247,7 +247,7 @@ def home():
         # to separate user's items
         if i.user_id == current_user.id:
             if (f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" ==
-                    f"{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}"):
+                    f"{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}"):
                 todo_date.append(i.due_date)
 
                 # to get rid of duplicat dates
@@ -256,8 +256,7 @@ def home():
     for i in all_dones:
         # to separate user's items
         if i.user_id == current_user.id:
-            if (f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" ==
-                    f"{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}"):
+            if f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" == f"{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}":
                 done_date.append(i.due_date)
 
                 # to get rid of duplicat dates
