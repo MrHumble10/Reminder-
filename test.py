@@ -283,7 +283,7 @@ def home():
             year = "".join(date.due_date).split('-')[0]
             all_years.append(year)
 # on condition that there is not any date it means there is noting to do
-    if not f'{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}' in x:
+    if not f"{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}" in x:
         nothing_for_this_month = True
     # preparing title to send to log in user
     if tomorrow_todos:
