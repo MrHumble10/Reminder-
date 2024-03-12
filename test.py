@@ -581,9 +581,9 @@ def tts():
         if request.method == 'POST':
             voice_id = int(request.form['voice_num'])
             selected_voice_id = "".join(data[voice_id]['voice_id'])
-            print(selected_voice_id)
-            print(request.form['voice_num'])
-            print(request.form['textarea'])
+            # print(selected_voice_id)
+            # print(request.form['voice_num'])
+            # print(request.form['textarea'])
             # Text to speech
             CHUNK_SIZE = 1024
             url = f"https://api.elevenlabs.io/v1/text-to-speech/{selected_voice_id}"
@@ -591,7 +591,7 @@ def tts():
             headers = {
               "Accept": "audio/mpeg",
               "Content-Type": "application/json",
-              "xi-api-key": "65b9028d58a95342c4a52f11048c36c4"
+              "xi-api-key": os.environ.get('xi-api-key')
             }
 
             data = {
