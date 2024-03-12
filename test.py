@@ -27,7 +27,7 @@ j_url = "https://api.elevenlabs.io/v1/voices"
 EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = '123456789'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 # os.environ.get('SECRET_KEY')
 
 
@@ -246,8 +246,7 @@ def home():
     for i in all_todos:
         # to separate user's items
         if i.user_id == current_user.id:
-            if (f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" ==
-                    f"{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}"):
+            if f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" == f"{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}":
                 todo_date.append(i.due_date)
 
                 # to get rid of duplicat dates
