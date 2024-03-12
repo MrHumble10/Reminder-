@@ -1,0 +1,43 @@
+{%include 'header.html'%}
+
+<body>
+        <div id="layoutError">
+            <div id="layoutError_content">
+                <main>
+
+                    <div class="container">
+                            <form action="{{url_for('tts')}}" method="post">
+                                <div class="row justify-content">
+                                <label for="exampleFormControlinput1" class="form-label py-3" style="resize: none;">Select a voice:</label>
+                            {%for num in range(0, data_length)%}
+                            <div class="col-lg-2 my-1">
+
+                                 <input name="voice_num" id="exampleFormControlinput1" class=" mx-2" title="Done" type="radio"
+                                             style="transform: scale(2);" value="{{num}}">
+                                            {{data[num]['name']}}
+                                </div>
+                                {%endfor%}
+                        </div>
+
+
+                        <div class="row justify-content-center">
+                            <div class="mb-5">
+                                  <label for="exampleFormControlTextarea1" class="form-label py-3" style="resize: none;">Write you text here:</label>
+                                  <textarea name="textarea" class="form-control" id="exampleFormControlTextarea1" rows="6"></textarea>
+                                    <button class="btn btn-dark my-2" type="submit">OK</button>
+
+                            </div>
+                            <audio controls class="my-3">
+                                <source src="./static/output.mp3" type="audio/mpeg">
+                                <source src="./static/output.mp3"  type="audio/ogg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                        </form>
+                    </div>
+
+                </main>
+            </div>
+            <div id="layoutError_footer">
+
+{%include 'footer.html'%}

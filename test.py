@@ -10,13 +10,16 @@ from flask_sqlalchemy import SQLAlchemy
 import datetime as dt
 from datetime import timedelta
 import calendar
+import requests
 from collections import Counter
 
-TODAY = str(dt.datetime.now().strftime('%Y-%m-%d'))
+j_url = "https://api.elevenlabs.io/v1/voices"
 
-TOMORROW = dt.datetime.now() + timedelta(days=1)
-CURRENT_MONTH = "".join(TODAY).split('-')[1]
-CURRENT_YEAR = "".join(TODAY).split('-')[0]
+# TODAY = str(dt.datetime.now().strftime('%Y-%m-%d'))
+#
+# TOMORROW = dt.datetime.now() + timedelta(days=1)
+# CURRENT_MONTH = "".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]
+# CURRENT_YEAR = "".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]
 # CURRENT_DAY = "".join(TODAY).split('-')[2].split(" ")[0]
 # TIME_TO_SEND_EMAIL = dt.datetime(int(CURRENT_YEAR),
 #                                  int(CURRENT_MONTH), int(CURRENT_DAY), 19, 23).timestamp()
@@ -24,7 +27,8 @@ CURRENT_YEAR = "".join(TODAY).split('-')[0]
 EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = '123456789'
+# os.environ.get('SECRET_KEY')
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
@@ -161,9 +165,9 @@ def admin_email():
     all_todos = result.scalars().all()
     tomorrow_todos = []
     for date in all_todos:
-        if date.due_date == TOMORROW.strftime('%Y-%m-%d'):
+        if date.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'):
             tomorrow_todos = db.session.execute(
-                db.select(Todos).where(Todos.due_date == TOMORROW.strftime('%Y-%m-%d'))).scalars().all()
+                db.select(Todos).where(Todos.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))).scalars().all()
     print(tomorrow_todos)
 
     #  preparing title to send to log in user
@@ -242,7 +246,8 @@ def home():
     for i in all_todos:
         # to separate user's items
         if i.user_id == current_user.id:
-            if f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" == f"{CURRENT_YEAR}-{CURRENT_MONTH}":
+            if (f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" ==
+                    f"{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}"):
                 todo_date.append(i.due_date)
 
                 # to get rid of duplicat dates
@@ -251,7 +256,8 @@ def home():
     for i in all_dones:
         # to separate user's items
         if i.user_id == current_user.id:
-            if f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" == f"{CURRENT_YEAR}-{CURRENT_MONTH}":
+            if (f"{i.due_date.split('-')[0]}-{i.due_date.split('-')[1]}" ==
+                    f"{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}"):
                 done_date.append(i.due_date)
 
                 # to get rid of duplicat dates
@@ -269,9 +275,9 @@ def home():
     nothing_for_this_month = ''
     for date in all_todos:
         if date.user_id == current_user.id:
-            if date.due_date == TOMORROW.strftime('%Y-%m-%d'):
+            if date.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'):
                 tomorrow_todos = db.session.execute(
-                    db.select(Todos).where(Todos.due_date == TOMORROW.strftime('%Y-%m-%d'))).scalars().all()
+                    db.select(Todos).where(Todos.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))).scalars().all()
             x.append(f'{"".join(date.due_date).split("-")[0]}-{"".join(date.due_date).split("-")[1]}')
 
 
@@ -279,10 +285,11 @@ def home():
             year = "".join(date.due_date).split('-')[0]
             all_years.append(year)
 # on condition that there is not any date it means there is noting to do
-    if not f'{CURRENT_YEAR}-{CURRENT_MONTH}' in x:
+    if not f'{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{"".join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}' in x:
         nothing_for_this_month = True
     # preparing title to send to log in user
     if tomorrow_todos:
+        print(tomorrow_todos)
         todo_title = ''
         for item in tomorrow_todos:
             if item.user_id == current_user.id:
@@ -290,12 +297,6 @@ def home():
                 todo_title += f"""
                                 <li class="mb-2">{item.info}.</li>
                             """
-        # if email is sent today it won't send again till next day
-        if not EMAIL_SENT_DATE == TODAY:
-            EMAIL_SENT_DATE = TODAY
-
-            # send_email(current_user.username, current_user.email, current_user.tel, msg=todo_title)
-
     else:
         pass
 
@@ -307,7 +308,7 @@ def home():
 
     return render_template('index.html', todos=all_todos, dones=all_dones,
                            user=current_user, unique_done_date=unique_done_date, unique_todo_date=unique_todo_date,
-                           today=TODAY, nothing_for_this_month=nothing_for_this_month,
+                           today=str(dt.datetime.now().strftime('%Y-%m-%d')), nothing_for_this_month=nothing_for_this_month,
                            years=sorted(list(set(all_years))), datetime=dt.datetime)
 
 
@@ -393,7 +394,7 @@ def years(year):
     return render_template('years.html', todos=all_todos, dones=all_dones,
                            user=current_user, unique_done_date=sorted(list(set(unique_done_date))),
                            unique_todo_date=sorted(list(set(unique_todo_date))),
-                           today=TODAY, no_date=no_date, all_is_done=all_is_done, years=sorted(list(set(all_years))),
+                           today=str(dt.datetime.now().strftime('%Y-%m-%d')), no_date=no_date, all_is_done=all_is_done, years=sorted(list(set(all_years))),
                            selected_year=request.url.split('year')[-1], current_month=dt.datetime.now().strftime("%B"),
                            datetime=dt.datetime)
 
@@ -455,7 +456,7 @@ def new_todo():
                 title=request.form['todo'][0].capitalize() + request.form['todo'][1:],
             )
             db.session.add(new_todo)
-            if new_todo.due_date < TODAY:
+            if new_todo.due_date < dt.datetime.now().strftime('%Y-%m-%d'):
                 flash('Date should be set for following days')
                 return redirect(url_for('new_todo'))
             db.session.commit()
@@ -562,8 +563,58 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route("/text-to-speech", methods=["GET", "POST"])
+def tts():
+    if current_user.is_authenticated:
+        result = requests.get(url=j_url)
+        data = result.json()['voices']
+        data_length = len(data)
 
+        voices = {'Rachel': '21m00Tcm4TlvDq8ikWAM', 'Drew': '29vD33N1CtxCmqQRPOHJ', 'Clyde': '2EiwWnXFnvU5JabPnv8n', 'Paul': '5Q0t7uMcjvnagumLfvZi', 'Domi': 'AZnzlk1XvdvUeBnXmlld', 'Dave': 'CYw3kZ02Hs0563khs1Fj', 'Fin': 'D38z5RcWu1voky8WS1ja', 'Sarah': 'EXAVITQu4vr4xnSDxMaL', 'Antoni': 'ErXwobaYiN019PkySvjV', 'Thomas': 'GBv7mTt0atIp3Br8iCZE', 'Charlie': 'IKne3meq5aSn9XLyUdCD', 'George': 'JBFqnCBsd6RMkjVDRZzb', 'Emily': 'LcfcDJNUP1GQjkzn1xUU', 'Elli': 'MF3mGyEYCl7XYWbV9V6O', 'Callum': 'N2lVS1w4EtoT3dr4eOWO', 'Patrick': 'ODq5zmih8GrVes37Dizd', 'Harry': 'SOYHLrjzK2X1ezoPC6cr', 'Liam': 'TX3LPaxmHKxFdv7VOQHJ', 'Dorothy': 'ThT5KcBeYPX3keUQqHPh', 'Josh': 'TxGEqnHWrfWFTfGW9XjX', 'Arnold': 'VR6AewLTigWG4xSOukaG', 'Charlotte': 'XB0fDUnXU5powFXDhCwa', 'Alice': 'Xb7hH8MSUJpSbSDYk0k2', 'Matilda': 'XrExE9yKIg1WjnnlVkGX', 'Matthew': 'Yko7PKHZNXotIFUBG7I9', 'James': 'ZQe5CZNOzWyzPSCn5a3c', 'Joseph': 'Zlb1dXrM653N07WRdFW3', 'Jeremy': 'bVMeCyTHy58xNoL34h3p', 'Michael': 'flq6f7yk4E4fJM5XTYuZ', 'Ethan': 'g5CIjZEefAph4nQFvHAz', 'Chris': 'iP95p4xoKVk53GoZ742B', 'Gigi': 'jBpfuIE2acCO8z3wKNLl', 'Freya': 'jsCqWAovK2LkecY7zXl4', 'Brian': 'nPczCjzI2devNBz1zQrb', 'Grace': 'oWAxZDx7w5VEj9dCyTzz', 'Daniel': 'onwK4e9ZLuTAKqWW03F9', 'Lily': 'pFZP5JQG7iQjIQuC4Bku', 'Serena': 'pMsXgVXv3BLzUgSXRplE', 'Adam': 'pNInz6obpgDQGcFmaJgB', 'Nicole': 'piTKgcLEGmPE4e6mEKli', 'Bill': 'pqHfZKP75CvOlQylNhV4', 'Jessie': 't0jbNlBVZ17f02VDIeMI', 'Sam': 'yoZ06aMxZJJ28mfd3POQ', 'Glinda': 'z9fAnlkpzviPz146aGWa', 'Giovanni': 'zcAOhNBS3c14rBihAFp1', 'Mimi': 'zrHiDhphv9ZnVXBqCLjz'}
 
+        # for num in range(data_length):
+        #     print(num)
+        #     #     print(data[num]['name'])
+        #     #     print(data[num]['voice_id'])
+        #     voices[f"{data[num]['name']}"] = f"{data[num]['voice_id']}"
+        # # int("".join(request.url.split('=')[1]))
+        # print(voices)
+
+        if request.method == 'POST':
+            voice_id = int(request.form['voice_num'])
+            selected_voice_id = "".join(data[voice_id]['voice_id'])
+            print(selected_voice_id)
+            print(request.form['voice_num'])
+            print(request.form['textarea'])
+            # Text to speech
+            CHUNK_SIZE = 1024
+            url = f"https://api.elevenlabs.io/v1/text-to-speech/{selected_voice_id}"
+
+            headers = {
+              "Accept": "audio/mpeg",
+              "Content-Type": "application/json",
+              "xi-api-key": "65b9028d58a95342c4a52f11048c36c4"
+            }
+
+            data = {
+              "text": request.form['textarea'],
+              "model_id": "eleven_monolingual_v1",
+              "voice_settings": {
+                "stability": 0.5,
+                "similarity_boost": 0.5
+              }
+            }
+
+            response = requests.post(url, json=data, headers=headers)
+            with open("./static/output.mp3", "wb") as f:
+                for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                    if chunk:
+                        f.write(chunk)
+            return redirect(url_for('tts'))
+        return render_template('tts.html', data=data, data_length=data_length)
+    else:
+        flash("login please")
+        return redirect(url_for('login'))
 
 
 
