@@ -563,56 +563,53 @@ def logout():
 
 @app.route("/text-to-speech", methods=["GET", "POST"])
 def tts():
-    if current_user.is_authenticated:
-        result = requests.get(url=j_url)
-        data = result.json()['voices']
-        data_length = len(data)
+    result = requests.get(url=j_url)
+    data = result.json()['voices']
+    data_length = len(data)
 
-        voices = {'Rachel': '21m00Tcm4TlvDq8ikWAM', 'Drew': '29vD33N1CtxCmqQRPOHJ', 'Clyde': '2EiwWnXFnvU5JabPnv8n', 'Paul': '5Q0t7uMcjvnagumLfvZi', 'Domi': 'AZnzlk1XvdvUeBnXmlld', 'Dave': 'CYw3kZ02Hs0563khs1Fj', 'Fin': 'D38z5RcWu1voky8WS1ja', 'Sarah': 'EXAVITQu4vr4xnSDxMaL', 'Antoni': 'ErXwobaYiN019PkySvjV', 'Thomas': 'GBv7mTt0atIp3Br8iCZE', 'Charlie': 'IKne3meq5aSn9XLyUdCD', 'George': 'JBFqnCBsd6RMkjVDRZzb', 'Emily': 'LcfcDJNUP1GQjkzn1xUU', 'Elli': 'MF3mGyEYCl7XYWbV9V6O', 'Callum': 'N2lVS1w4EtoT3dr4eOWO', 'Patrick': 'ODq5zmih8GrVes37Dizd', 'Harry': 'SOYHLrjzK2X1ezoPC6cr', 'Liam': 'TX3LPaxmHKxFdv7VOQHJ', 'Dorothy': 'ThT5KcBeYPX3keUQqHPh', 'Josh': 'TxGEqnHWrfWFTfGW9XjX', 'Arnold': 'VR6AewLTigWG4xSOukaG', 'Charlotte': 'XB0fDUnXU5powFXDhCwa', 'Alice': 'Xb7hH8MSUJpSbSDYk0k2', 'Matilda': 'XrExE9yKIg1WjnnlVkGX', 'Matthew': 'Yko7PKHZNXotIFUBG7I9', 'James': 'ZQe5CZNOzWyzPSCn5a3c', 'Joseph': 'Zlb1dXrM653N07WRdFW3', 'Jeremy': 'bVMeCyTHy58xNoL34h3p', 'Michael': 'flq6f7yk4E4fJM5XTYuZ', 'Ethan': 'g5CIjZEefAph4nQFvHAz', 'Chris': 'iP95p4xoKVk53GoZ742B', 'Gigi': 'jBpfuIE2acCO8z3wKNLl', 'Freya': 'jsCqWAovK2LkecY7zXl4', 'Brian': 'nPczCjzI2devNBz1zQrb', 'Grace': 'oWAxZDx7w5VEj9dCyTzz', 'Daniel': 'onwK4e9ZLuTAKqWW03F9', 'Lily': 'pFZP5JQG7iQjIQuC4Bku', 'Serena': 'pMsXgVXv3BLzUgSXRplE', 'Adam': 'pNInz6obpgDQGcFmaJgB', 'Nicole': 'piTKgcLEGmPE4e6mEKli', 'Bill': 'pqHfZKP75CvOlQylNhV4', 'Jessie': 't0jbNlBVZ17f02VDIeMI', 'Sam': 'yoZ06aMxZJJ28mfd3POQ', 'Glinda': 'z9fAnlkpzviPz146aGWa', 'Giovanni': 'zcAOhNBS3c14rBihAFp1', 'Mimi': 'zrHiDhphv9ZnVXBqCLjz'}
+    voices = {'Rachel': '21m00Tcm4TlvDq8ikWAM', 'Drew': '29vD33N1CtxCmqQRPOHJ', 'Clyde': '2EiwWnXFnvU5JabPnv8n', 'Paul': '5Q0t7uMcjvnagumLfvZi', 'Domi': 'AZnzlk1XvdvUeBnXmlld', 'Dave': 'CYw3kZ02Hs0563khs1Fj', 'Fin': 'D38z5RcWu1voky8WS1ja', 'Sarah': 'EXAVITQu4vr4xnSDxMaL', 'Antoni': 'ErXwobaYiN019PkySvjV', 'Thomas': 'GBv7mTt0atIp3Br8iCZE', 'Charlie': 'IKne3meq5aSn9XLyUdCD', 'George': 'JBFqnCBsd6RMkjVDRZzb', 'Emily': 'LcfcDJNUP1GQjkzn1xUU', 'Elli': 'MF3mGyEYCl7XYWbV9V6O', 'Callum': 'N2lVS1w4EtoT3dr4eOWO', 'Patrick': 'ODq5zmih8GrVes37Dizd', 'Harry': 'SOYHLrjzK2X1ezoPC6cr', 'Liam': 'TX3LPaxmHKxFdv7VOQHJ', 'Dorothy': 'ThT5KcBeYPX3keUQqHPh', 'Josh': 'TxGEqnHWrfWFTfGW9XjX', 'Arnold': 'VR6AewLTigWG4xSOukaG', 'Charlotte': 'XB0fDUnXU5powFXDhCwa', 'Alice': 'Xb7hH8MSUJpSbSDYk0k2', 'Matilda': 'XrExE9yKIg1WjnnlVkGX', 'Matthew': 'Yko7PKHZNXotIFUBG7I9', 'James': 'ZQe5CZNOzWyzPSCn5a3c', 'Joseph': 'Zlb1dXrM653N07WRdFW3', 'Jeremy': 'bVMeCyTHy58xNoL34h3p', 'Michael': 'flq6f7yk4E4fJM5XTYuZ', 'Ethan': 'g5CIjZEefAph4nQFvHAz', 'Chris': 'iP95p4xoKVk53GoZ742B', 'Gigi': 'jBpfuIE2acCO8z3wKNLl', 'Freya': 'jsCqWAovK2LkecY7zXl4', 'Brian': 'nPczCjzI2devNBz1zQrb', 'Grace': 'oWAxZDx7w5VEj9dCyTzz', 'Daniel': 'onwK4e9ZLuTAKqWW03F9', 'Lily': 'pFZP5JQG7iQjIQuC4Bku', 'Serena': 'pMsXgVXv3BLzUgSXRplE', 'Adam': 'pNInz6obpgDQGcFmaJgB', 'Nicole': 'piTKgcLEGmPE4e6mEKli', 'Bill': 'pqHfZKP75CvOlQylNhV4', 'Jessie': 't0jbNlBVZ17f02VDIeMI', 'Sam': 'yoZ06aMxZJJ28mfd3POQ', 'Glinda': 'z9fAnlkpzviPz146aGWa', 'Giovanni': 'zcAOhNBS3c14rBihAFp1', 'Mimi': 'zrHiDhphv9ZnVXBqCLjz'}
 
-        # for num in range(data_length):
-        #     print(num)
-        #     #     print(data[num]['name'])
-        #     #     print(data[num]['voice_id'])
-        #     voices[f"{data[num]['name']}"] = f"{data[num]['voice_id']}"
-        # # int("".join(request.url.split('=')[1]))
-        # print(voices)
+    # for num in range(data_length):
+    #     print(num)
+    #     #     print(data[num]['name'])
+    #     #     print(data[num]['voice_id'])
+    #     voices[f"{data[num]['name']}"] = f"{data[num]['voice_id']}"
+    # # int("".join(request.url.split('=')[1]))
+    # print(voices)
 
-        if request.method == 'POST':
-            voice_id = int(request.form['voice_num'])
-            selected_voice_id = "".join(data[voice_id]['voice_id'])
-            # print(selected_voice_id)
-            # print(request.form['voice_num'])
-            # print(request.form['textarea'])
-            # Text to speech
-            CHUNK_SIZE = 1024
-            url = f"https://api.elevenlabs.io/v1/text-to-speech/{selected_voice_id}"
+    if request.method == 'POST':
+        voice_id = int(request.form['voice_num'])
+        selected_voice_id = "".join(data[voice_id]['voice_id'])
+        # print(selected_voice_id)
+        # print(request.form['voice_num'])
+        # print(request.form['textarea'])
+        # Text to speech
+        CHUNK_SIZE = 1024
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{selected_voice_id}"
 
-            headers = {
-              "Accept": "audio/mpeg",
-              "Content-Type": "application/json",
-              "xi-api-key": os.environ.get('xi-api-key')
-            }
+        headers = {
+          "Accept": "audio/mpeg",
+          "Content-Type": "application/json",
+          "xi-api-key": os.environ.get('xi-api-key')
+        }
 
-            data = {
-              "text": request.form['textarea'],
-              "model_id": "eleven_monolingual_v1",
-              "voice_settings": {
-                "stability": 0.5,
-                "similarity_boost": 0.5
-              }
-            }
+        data = {
+          "text": request.form['textarea'],
+          "model_id": "eleven_monolingual_v1",
+          "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.5
+          }
+        }
 
-            response = requests.post(url, json=data, headers=headers)
-            with open("./static/output.mp3", "wb") as f:
-                for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-                    if chunk:
-                        f.write(chunk)
-            return redirect(url_for('tts'))
-        return render_template('tts.html', data=data, data_length=data_length)
-    else:
-        flash("login please")
-        return redirect(url_for('login'))
+        response = requests.post(url, json=data, headers=headers)
+        with open("./static/output.mp3", "wb") as f:
+            for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                if chunk:
+                    f.write(chunk)
+        return redirect(url_for('tts'))
+    return render_template('tts.html', data=data, data_length=data_length)
+
 
 
 
