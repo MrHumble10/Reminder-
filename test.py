@@ -454,7 +454,7 @@ def new_todo():
                 title=request.form['todo'][0].capitalize() + request.form['todo'][1:],
             )
             db.session.add(new_todo)
-            if new_todo.due_date < dt.datetime.today().strftime('%Y-%m-%d'):
+            if not dt.datetime.now().strftime('%Y-%m-%d') >= new_todo.due_date:
                 flash('Date should be set for following days')
                 return redirect(url_for('new_todo'))
             db.session.commit()
