@@ -1,39 +1,23 @@
-from mailjet_rest import Client
+from mailjet_rest import Client as mailjet_Client
 from flask import Flask, render_template, redirect, url_for, request, flash, abort
 import os
-# def reply_mail(name, email):
-#     MJ_APIKEY_PRIVATE = '3989ddb697e3f2feb9950571f17b79dd'
-#         # os.environ.get("MJ_APIKEY_PRIVATE")
-#     MJ_APIKEY_PUBLIC = '51045e3e145ebe22953a762762d80622'
-#         # os.environ.get("MJ_APIKEY_PUBLIC")
-#
-#
-#     # os.environ.get("MJ_APIKEY_PRIVATE")
-#     mailjet = Client(auth=(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE), version='v3.1')
-#     data = {
-#         'Messages': [
-#             {
-#                 "From": {
-#                     "Email": "humble.py.test@gmail.com",
-#                     "Name": "Me"
-#                 },
-#                 "To": [
-#                     {
-#                         "Email": f"{email}",
-#                         "Name": "You"
-#                     }
-#                 ],
-#                 "Subject": "REPLY FROM POST LAND!",
-#                 "TextPart": f"Dear {name}\n\nWe have received your message and our response would be sent to you soon."
-#                             f"Thank you\n\nPOSTLAND TEAM",
-#                 "HTMLPart": ""
-#             }
-#         ]
-#     }
-#     result = mailjet.send.create(data=data)
-#     print(result.status_code)
-#     print(result.json())
-#
+import requests
+from twilio.rest import Client as twilio_Client
+
+
+def send_sms(msg, tel):
+
+    account_sid = os.environ.get('account_sid')
+    auth_token = os.environ.get('auth_token')
+    client = twilio_Client(account_sid, auth_token)
+
+    message = client.messages.create(
+        from_='whatsapp:+14155238886',
+        body=f'{msg}',
+        to=f'whatsapp:{tel}'
+    )
+
+    print(message.sid)
 
 
 def send_email(user_name, user_email, tel, msg, item_id):
@@ -42,8 +26,7 @@ def send_email(user_name, user_email, tel, msg, item_id):
     # os.environ.get("MJ_APIKEY_PUBLIC")
     MJ_APIKEY_PUBLIC = os.environ.get("MJ_APIKEY_PUBLIC")
 
-
-    mailjet = Client(auth=(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE), version='v3.1')
+    mailjet = mailjet_Client(auth=(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE), version='v3.1')
     data = {
         'Messages': [
             {

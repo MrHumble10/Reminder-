@@ -1,9 +1,8 @@
-
 from flask import Flask, render_template, redirect, url_for, request, flash, abort
 # from flask_ckeditor import CKEditor
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user
-from notification import send_email
+from notification import send_email, send_sms
 import os
 # from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
@@ -28,8 +27,6 @@ EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-# os.environ.get('SECRET_KEY')
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
 
@@ -83,6 +80,7 @@ def nav_year():
     all_years = list(set(all_years))
     return sorted(list(set(all_years)))
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.get_or_404(User, user_id)
@@ -108,6 +106,16 @@ class Done(UserMixin, db.Model):
     favorites = db.Column(db.Boolean)
 
 
+class Sound(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String(50), nullable=False)
+    info = db.Column(db.String(50), nullable=True)
+    due_date = db.Column(db.String)
+    done = db.Column(db.Boolean, nullable=True)
+    favorites = db.Column(db.Boolean)
+
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -119,11 +127,7 @@ class User(UserMixin, db.Model):
 
 
 with app.app_context():
-
     db.create_all()
-
-
-
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -167,12 +171,14 @@ def admin_email():
     for date in all_todos:
         if date.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'):
             tomorrow_todos = db.session.execute(
-                db.select(Todos).where(Todos.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))).scalars().all()
+                db.select(Todos).where(
+                    Todos.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))).scalars().all()
     print(tomorrow_todos)
 
     #  preparing title to send to log in user
     if tomorrow_todos:
         todo_title = ''
+
         for item in tomorrow_todos:
             user = db.get_or_404(User, item.user_id)
 
@@ -181,12 +187,19 @@ def admin_email():
                                                     <li class="mb-2">{item.info}.</li>
                                                 """
             send_email(user.username, user.email, user.tel, msg=todo_title, item_id=item.id)
+
+            send_sms(f"Hi Dear {user.username}\nYou have already sat plan(s) for tomorrow"
+                     f"This Email has been sent to you "
+                     f"in order to remember what you are going to do by Tomorrow.\n"
+                     f"To know more details https://myreminder.onrender.com Click here."
+                     f"Your TODO List:\n"
+                     f"{item.info}\n", tel=user.tel)
+
     return render_template('login.html')
 
 
 @app.route("/", methods=["GET", "POST"])
 def login():
-
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['pswd']
@@ -230,7 +243,6 @@ def login():
 
 @app.route("/home", methods=["GET", "POST"])
 def home():
-
     global EMAIL_SENT_DATE
 
     all_years = []
@@ -275,14 +287,13 @@ def home():
         if date.user_id == current_user.id:
             if date.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'):
                 tomorrow_todos = db.session.execute(
-                    db.select(Todos).where(Todos.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))).scalars().all()
+                    db.select(Todos).where(
+                        Todos.due_date == (dt.datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))).scalars().all()
             x.append(f'{"".join(date.due_date).split("-")[0]}-{"".join(date.due_date).split("-")[1]}')
-
-
 
             year = "".join(date.due_date).split('-')[0]
             all_years.append(year)
-# on condition that there is not any date it means there is noting to do
+    # on condition that there is not any date it means there is noting to do
     if not f"{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[0]}-{''.join(dt.datetime.now().strftime('%Y-%m-%d')).split('-')[1]}" in x:
         nothing_for_this_month = True
     # preparing title to send to log in user
@@ -298,7 +309,6 @@ def home():
     else:
         pass
 
-
     # if toto is done the year num stay in years list
     for date in all_dones:
         year = "".join(date.due_date).split('-')[0]
@@ -306,7 +316,8 @@ def home():
 
     return render_template('index.html', todos=all_todos, dones=all_dones,
                            user=current_user, unique_done_date=unique_done_date, unique_todo_date=unique_todo_date,
-                           today=str(dt.datetime.now().strftime('%Y-%m-%d')), nothing_for_this_month=nothing_for_this_month,
+                           today=str(dt.datetime.now().strftime('%Y-%m-%d')),
+                           nothing_for_this_month=nothing_for_this_month,
                            years=sorted(list(set(all_years))), datetime=dt.datetime)
 
 
@@ -346,7 +357,7 @@ def years(year):
     # if done_date:
     #     unique_done_date.sort(key=lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
 
-# to sort years
+    # to sort years
     for date in unique_todo_date:
         year = "".join(date).split('-')[0]
         all_years.append(year)
@@ -357,7 +368,7 @@ def years(year):
         all_years.append(year)
     all_years = list(set(all_years))
     # on condition that there is not any date it means there is noting to do
-    if not todo_date :
+    if not todo_date:
         no_date = True
     else:
         no_date = False
@@ -366,8 +377,6 @@ def years(year):
         pass
     elif not all_todos:
         all_is_done = True
-
-
 
     # with app.app_context():
     #     # sending email if there is date of tomorrow in Todo
@@ -381,20 +390,21 @@ def years(year):
     #             items.append(item.user_id)
     #     print(items)
 
-        # email_counts = Counter(emails)
-        # # Print the results
-        # for email, count in email_counts.items():
-        #     print(f"{email} ({count})")
+    # email_counts = Counter(emails)
+    # # Print the results
+    # for email, count in email_counts.items():
+    #     print(f"{email} ({count})")
 
-        # db.create_all()
-
+    # db.create_all()
 
     return render_template('years.html', todos=all_todos, dones=all_dones,
                            user=current_user, unique_done_date=sorted(list(set(unique_done_date))),
                            unique_todo_date=sorted(list(set(unique_todo_date))),
-                           today=str(dt.datetime.now().strftime('%Y-%m-%d')), no_date=no_date, all_is_done=all_is_done, years=sorted(list(set(all_years))),
+                           today=str(dt.datetime.now().strftime('%Y-%m-%d')), no_date=no_date, all_is_done=all_is_done,
+                           years=sorted(list(set(all_years))),
                            selected_year=request.url.split('year')[-1], current_month=dt.datetime.now().strftime("%B"),
                            datetime=dt.datetime)
+
 
 # it will turn month number to its name
 @app.template_filter()
@@ -421,6 +431,7 @@ def add_to_done(item_id):
     db.session.commit()
     return redirect(url_for('years', year="".join(selected_todo.due_date).split('-')[0]))
 
+
 # returning to todos
 @app.route("/d<int:the_id>", methods=["GET", "POST"])
 def d(the_id):
@@ -438,6 +449,7 @@ def d(the_id):
     db.session.commit()
     return redirect(url_for('years', year="".join(item.due_date).split('-')[0]))
 
+
 @app.route("/add", methods=["GET", "POST"])
 def new_todo():
     if request.method == 'POST':
@@ -454,7 +466,8 @@ def new_todo():
                 title=request.form['todo'][0].capitalize() + request.form['todo'][1:],
             )
             db.session.add(new_todo)
-            if not dt.datetime.now().strftime('%Y-%m-%d') >= new_todo.due_date:
+            print(dt.datetime.now().strftime('%Y-%m-%d'))
+            if new_todo.due_date < dt.datetime.now().strftime('%Y-%m-%d'):
                 flash('Date should be set for following days')
                 return redirect(url_for('new_todo'))
             db.session.commit()
@@ -464,6 +477,7 @@ def new_todo():
             return redirect(url_for('new_todo'))
 
     return render_template('add_todo.html', years=sorted(list(set(nav_year()))))
+
 
 @app.route("/done", methods=["GET", "POST"])
 def dones(item):
@@ -508,7 +522,8 @@ def edit(item_id):
         item.title = request.form['todo'][0].capitalize() + request.form['todo'][1:]
         db.session.commit()
         return redirect(url_for('home', item_id=item.id))
-    return render_template('add_todo.html', item=item, is_edit=True, edit_form=edit_todo, years=sorted(list(set(nav_year()))))
+    return render_template('add_todo.html', item=item, is_edit=True, edit_form=edit_todo,
+                           years=sorted(list(set(nav_year()))))
 
 
 @app.route("/details<int:item_id>", methods=["GET", "POST"])
@@ -519,7 +534,8 @@ def details(item_id):
         info=item.info,
         title=item.title,
     )
-    return render_template('add_todo.html', item=item, is_detail=True, detail=detail, years=sorted(list(set(nav_year()))))
+    return render_template('add_todo.html', item=item, is_detail=True, detail=detail,
+                           years=sorted(list(set(nav_year()))))
 
 
 @app.route("/edit-info<int:item_id>", methods=["GET", "POST"])
@@ -531,6 +547,7 @@ def edit_info(item_id):
         db.session.commit()
         return redirect(url_for('info', item_id=item.id))
     return render_template('index.html', item=item, edited_info=True)
+
 
 @app.route("/del<int:item_id>", methods=["GET", "POST"])
 def del_item(item_id):
@@ -568,7 +585,22 @@ def tts():
         data = result.json()['voices']
         data_length = len(data)
 
-        voices = {'Rachel': '21m00Tcm4TlvDq8ikWAM', 'Drew': '29vD33N1CtxCmqQRPOHJ', 'Clyde': '2EiwWnXFnvU5JabPnv8n', 'Paul': '5Q0t7uMcjvnagumLfvZi', 'Domi': 'AZnzlk1XvdvUeBnXmlld', 'Dave': 'CYw3kZ02Hs0563khs1Fj', 'Fin': 'D38z5RcWu1voky8WS1ja', 'Sarah': 'EXAVITQu4vr4xnSDxMaL', 'Antoni': 'ErXwobaYiN019PkySvjV', 'Thomas': 'GBv7mTt0atIp3Br8iCZE', 'Charlie': 'IKne3meq5aSn9XLyUdCD', 'George': 'JBFqnCBsd6RMkjVDRZzb', 'Emily': 'LcfcDJNUP1GQjkzn1xUU', 'Elli': 'MF3mGyEYCl7XYWbV9V6O', 'Callum': 'N2lVS1w4EtoT3dr4eOWO', 'Patrick': 'ODq5zmih8GrVes37Dizd', 'Harry': 'SOYHLrjzK2X1ezoPC6cr', 'Liam': 'TX3LPaxmHKxFdv7VOQHJ', 'Dorothy': 'ThT5KcBeYPX3keUQqHPh', 'Josh': 'TxGEqnHWrfWFTfGW9XjX', 'Arnold': 'VR6AewLTigWG4xSOukaG', 'Charlotte': 'XB0fDUnXU5powFXDhCwa', 'Alice': 'Xb7hH8MSUJpSbSDYk0k2', 'Matilda': 'XrExE9yKIg1WjnnlVkGX', 'Matthew': 'Yko7PKHZNXotIFUBG7I9', 'James': 'ZQe5CZNOzWyzPSCn5a3c', 'Joseph': 'Zlb1dXrM653N07WRdFW3', 'Jeremy': 'bVMeCyTHy58xNoL34h3p', 'Michael': 'flq6f7yk4E4fJM5XTYuZ', 'Ethan': 'g5CIjZEefAph4nQFvHAz', 'Chris': 'iP95p4xoKVk53GoZ742B', 'Gigi': 'jBpfuIE2acCO8z3wKNLl', 'Freya': 'jsCqWAovK2LkecY7zXl4', 'Brian': 'nPczCjzI2devNBz1zQrb', 'Grace': 'oWAxZDx7w5VEj9dCyTzz', 'Daniel': 'onwK4e9ZLuTAKqWW03F9', 'Lily': 'pFZP5JQG7iQjIQuC4Bku', 'Serena': 'pMsXgVXv3BLzUgSXRplE', 'Adam': 'pNInz6obpgDQGcFmaJgB', 'Nicole': 'piTKgcLEGmPE4e6mEKli', 'Bill': 'pqHfZKP75CvOlQylNhV4', 'Jessie': 't0jbNlBVZ17f02VDIeMI', 'Sam': 'yoZ06aMxZJJ28mfd3POQ', 'Glinda': 'z9fAnlkpzviPz146aGWa', 'Giovanni': 'zcAOhNBS3c14rBihAFp1', 'Mimi': 'zrHiDhphv9ZnVXBqCLjz'}
+        voices = {'Rachel': '21m00Tcm4TlvDq8ikWAM', 'Drew': '29vD33N1CtxCmqQRPOHJ', 'Clyde': '2EiwWnXFnvU5JabPnv8n',
+                  'Paul': '5Q0t7uMcjvnagumLfvZi', 'Domi': 'AZnzlk1XvdvUeBnXmlld', 'Dave': 'CYw3kZ02Hs0563khs1Fj',
+                  'Fin': 'D38z5RcWu1voky8WS1ja', 'Sarah': 'EXAVITQu4vr4xnSDxMaL', 'Antoni': 'ErXwobaYiN019PkySvjV',
+                  'Thomas': 'GBv7mTt0atIp3Br8iCZE', 'Charlie': 'IKne3meq5aSn9XLyUdCD', 'George': 'JBFqnCBsd6RMkjVDRZzb',
+                  'Emily': 'LcfcDJNUP1GQjkzn1xUU', 'Elli': 'MF3mGyEYCl7XYWbV9V6O', 'Callum': 'N2lVS1w4EtoT3dr4eOWO',
+                  'Patrick': 'ODq5zmih8GrVes37Dizd', 'Harry': 'SOYHLrjzK2X1ezoPC6cr', 'Liam': 'TX3LPaxmHKxFdv7VOQHJ',
+                  'Dorothy': 'ThT5KcBeYPX3keUQqHPh', 'Josh': 'TxGEqnHWrfWFTfGW9XjX', 'Arnold': 'VR6AewLTigWG4xSOukaG',
+                  'Charlotte': 'XB0fDUnXU5powFXDhCwa', 'Alice': 'Xb7hH8MSUJpSbSDYk0k2',
+                  'Matilda': 'XrExE9yKIg1WjnnlVkGX', 'Matthew': 'Yko7PKHZNXotIFUBG7I9', 'James': 'ZQe5CZNOzWyzPSCn5a3c',
+                  'Joseph': 'Zlb1dXrM653N07WRdFW3', 'Jeremy': 'bVMeCyTHy58xNoL34h3p', 'Michael': 'flq6f7yk4E4fJM5XTYuZ',
+                  'Ethan': 'g5CIjZEefAph4nQFvHAz', 'Chris': 'iP95p4xoKVk53GoZ742B', 'Gigi': 'jBpfuIE2acCO8z3wKNLl',
+                  'Freya': 'jsCqWAovK2LkecY7zXl4', 'Brian': 'nPczCjzI2devNBz1zQrb', 'Grace': 'oWAxZDx7w5VEj9dCyTzz',
+                  'Daniel': 'onwK4e9ZLuTAKqWW03F9', 'Lily': 'pFZP5JQG7iQjIQuC4Bku', 'Serena': 'pMsXgVXv3BLzUgSXRplE',
+                  'Adam': 'pNInz6obpgDQGcFmaJgB', 'Nicole': 'piTKgcLEGmPE4e6mEKli', 'Bill': 'pqHfZKP75CvOlQylNhV4',
+                  'Jessie': 't0jbNlBVZ17f02VDIeMI', 'Sam': 'yoZ06aMxZJJ28mfd3POQ', 'Glinda': 'z9fAnlkpzviPz146aGWa',
+                  'Giovanni': 'zcAOhNBS3c14rBihAFp1', 'Mimi': 'zrHiDhphv9ZnVXBqCLjz'}
 
         # for num in range(data_length):
         #     print(num)
@@ -589,18 +621,18 @@ def tts():
             url = f"https://api.elevenlabs.io/v1/text-to-speech/{selected_voice_id}"
 
             headers = {
-              "Accept": "audio/mpeg",
-              "Content-Type": "application/json",
-              "xi-api-key": os.environ.get('xi-api-key')
+                "Accept": "audio/mpeg",
+                "Content-Type": "application/json",
+                "xi-api-key": os.environ.get('xi-api-key')
             }
 
             data = {
-              "text": request.form['textarea'],
-              "model_id": "eleven_monolingual_v1",
-              "voice_settings": {
-                "stability": 0.5,
-                "similarity_boost": 0.5
-              }
+                "text": request.form['textarea'],
+                "model_id": "eleven_monolingual_v1",
+                "voice_settings": {
+                    "stability": 0.5,
+                    "similarity_boost": 0.5
+                }
             }
 
             response = requests.post(url, json=data, headers=headers)
@@ -613,7 +645,6 @@ def tts():
     else:
         flash("login please")
         return redirect(url_for('login'))
-
 
 
 if __name__ == "__main__":
