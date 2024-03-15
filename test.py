@@ -28,8 +28,8 @@ URL = "https://api.genny.lovo.ai"
 EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = '123456789'
-os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
 
 # Bootstrap5(app)
@@ -99,16 +99,6 @@ class Todos(UserMixin, db.Model):
 
 
 class Done(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=False)
-    title = db.Column(db.String(50), nullable=False)
-    info = db.Column(db.String(50), nullable=True)
-    due_date = db.Column(db.String)
-    done = db.Column(db.Boolean, nullable=True)
-    favorites = db.Column(db.Boolean)
-
-
-class Sound(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String(50), nullable=False)
@@ -616,7 +606,7 @@ def tts():
         headers = {
             "accept": "application/json",
             "content-type": "application/json",
-            "X-API-KEY": "1f1b77ce-bd3b-4aed-ac70-267fd1b50c46",
+            "X-API-KEY": os.environ.get('X-API-KEY'),
         }
 
         # GET Speakers
