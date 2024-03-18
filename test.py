@@ -28,7 +28,7 @@ URL = "https://api.genny.lovo.ai"
 EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = '123456789'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
 
@@ -154,7 +154,6 @@ def register():
             return redirect(url_for('home'))
     return render_template("register.html")
 
-
 @app.route("/email123456789")
 def admin_email():
     result = db.session.execute(db.select(Todos))
@@ -186,6 +185,9 @@ def admin_email():
                      f"To know more details https://myreminder.onrender.com Click here."
                      f"Your TODO List:\n"
                      f"{item.info}\n", tel=user.tel)
+
+
+
 
     return render_template('login.html')
 
@@ -573,498 +575,19 @@ def logout():
 @app.route("/text-to-speech", methods=["GET", "POST"])
 def tts():
     if current_user.is_authenticated:
-        # result = requests.get(url=j_url)
-        # data = result.json()['voices']
-        # data_length = len(data)
-        # LANGUAGE_BY_LOCALE = {
-        #     "af_NA": "Afrikaans (Namibia)",
-        #     "af_ZA": "Afrikaans (South Africa)",
-        #     "af": "Afrikaans",
-        #     "ak_GH": "Akan (Ghana)",
-        #     "ak": "Akan",
-        #     "sq_AL": "Albanian (Albania)",
-        #     "sq": "Albanian",
-        #     "am_ET": "Amharic (Ethiopia)",
-        #     "am": "Amharic",
-        #     "ar_DZ": "Arabic (Algeria)",
-        #     "ar_BH": "Arabic (Bahrain)",
-        #     "ar_EG": "Arabic (Egypt)",
-        #     "ar_IQ": "Arabic (Iraq)",
-        #     "ar_JO": "Arabic (Jordan)",
-        #     "ar_KW": "Arabic (Kuwait)",
-        #     "ar_LB": "Arabic (Lebanon)",
-        #     "ar_LY": "Arabic (Libya)",
-        #     "ar_MA": "Arabic (Morocco)",
-        #     "ar_OM": "Arabic (Oman)",
-        #     "ar_QA": "Arabic (Qatar)",
-        #     "ar_SA": "Arabic (Saudi Arabia)",
-        #     "ar_SD": "Arabic (Sudan)",
-        #     "ar_SY": "Arabic (Syria)",
-        #     "ar_TN": "Arabic (Tunisia)",
-        #     "ar_AE": "Arabic (United Arab Emirates)",
-        #     "ar_YE": "Arabic (Yemen)",
-        #     "ar": "Arabic",
-        #     "hy_AM": "Armenian (Armenia)",
-        #     "hy": "Armenian",
-        #     "as_IN": "Assamese (India)",
-        #     "as": "Assamese",
-        #     "asa_TZ": "Asu (Tanzania)",
-        #     "asa": "Asu",
-        #     "az_Cyrl": "Azerbaijani (Cyrillic)",
-        #     "az_Cyrl_AZ": "Azerbaijani (Cyrillic, Azerbaijan)",
-        #     "az_Latn": "Azerbaijani (Latin)",
-        #     "az_Latn_AZ": "Azerbaijani (Latin, Azerbaijan)",
-        #     "az": "Azerbaijani",
-        #     "bm_ML": "Bambara (Mali)",
-        #     "bm": "Bambara",
-        #     "eu_ES": "Basque (Spain)",
-        #     "eu": "Basque",
-        #     "be_BY": "Belarusian (Belarus)",
-        #     "be": "Belarusian",
-        #     "bem_ZM": "Bemba (Zambia)",
-        #     "bem": "Bemba",
-        #     "bez_TZ": "Bena (Tanzania)",
-        #     "bez": "Bena",
-        #     "bn_BD": "Bengali (Bangladesh)",
-        #     "bn_IN": "Bengali (India)",
-        #     "bn": "Bengali",
-        #     "bs_BA": "Bosnian (Bosnia and Herzegovina)",
-        #     "bs": "Bosnian",
-        #     "bg_BG": "Bulgarian (Bulgaria)",
-        #     "bg": "Bulgarian",
-        #     "my_MM": "Burmese (Myanmar [Burma])",
-        #     "my": "Burmese",
-        #     "yue_Hant_HK": "Cantonese (Traditional, Hong Kong SAR China)",
-        #     "ca_ES": "Catalan (Spain)",
-        #     "ca": "Catalan",
-        #     "tzm_Latn": "Central Morocco Tamazight (Latin)",
-        #     "tzm_Latn_MA": "Central Morocco Tamazight (Latin, Morocco)",
-        #     "tzm": "Central Morocco Tamazight",
-        #     "chr_US": "Cherokee (United States)",
-        #     "chr": "Cherokee",
-        #     "cgg_UG": "Chiga (Uganda)",
-        #     "cgg": "Chiga",
-        #     "zh_Hans": "Chinese (Simplified Han)",
-        #     "zh_Hans_CN": "Chinese (Simplified Han, China)",
-        #     "zh_Hans_HK": "Chinese (Simplified Han, Hong Kong SAR China)",
-        #     "zh_Hans_MO": "Chinese (Simplified Han, Macau SAR China)",
-        #     "zh_Hans_SG": "Chinese (Simplified Han, Singapore)",
-        #     "zh_Hant": "Chinese (Traditional Han)",
-        #     "zh_Hant_HK": "Chinese (Traditional Han, Hong Kong SAR China)",
-        #     "zh_Hant_MO": "Chinese (Traditional Han, Macau SAR China)",
-        #     "zh_Hant_TW": "Chinese (Traditional Han, Taiwan)",
-        #     "zh": "Chinese",
-        #     "kw_GB": "Cornish (United Kingdom)",
-        #     "kw": "Cornish",
-        #     "hr_HR": "Croatian (Croatia)",
-        #     "hr": "Croatian",
-        #     "cs_CZ": "Czech (Czech Republic)",
-        #     "cs": "Czech",
-        #     "da_DK": "Danish (Denmark)",
-        #     "da": "Danish",
-        #     "nl_BE": "Dutch (Belgium)",
-        #     "nl_NL": "Dutch (Netherlands)",
-        #     "nl": "Dutch",
-        #     "ebu_KE": "Embu (Kenya)",
-        #     "ebu": "Embu",
-        #     "en_AS": "English (American Samoa)",
-        #     "en_AU": "English (Australia)",
-        #     "en_BE": "English (Belgium)",
-        #     "en_BZ": "English (Belize)",
-        #     "en_BW": "English (Botswana)",
-        #     "en_CA": "English (Canada)",
-        #     "en_GU": "English (Guam)",
-        #     "en_HK": "English (Hong Kong SAR China)",
-        #     "en_IN": "English (India)",
-        #     "en_IE": "English (Ireland)",
-        #     "en_IL": "English (Israel)",
-        #     "en_JM": "English (Jamaica)",
-        #     "en_MT": "English (Malta)",
-        #     "en_MH": "English (Marshall Islands)",
-        #     "en_MU": "English (Mauritius)",
-        #     "en_NA": "English (Namibia)",
-        #     "en_NZ": "English (New Zealand)",
-        #     "en_MP": "English (Northern Mariana Islands)",
-        #     "en_PK": "English (Pakistan)",
-        #     "en_PH": "English (Philippines)",
-        #     "en_SG": "English (Singapore)",
-        #     "en_ZA": "English (South Africa)",
-        #     "en_TT": "English (Trinidad and Tobago)",
-        #     "en_UM": "English (U.S. Minor Outlying Islands)",
-        #     "en_VI": "English (U.S. Virgin Islands)",
-        #     "en_GB": "English (United Kingdom)",
-        #     "en_US": "English (United States)",
-        #     "en_ZW": "English (Zimbabwe)",
-        #     "en": "English",
-        #     "eo": "Esperanto",
-        #     "et_EE": "Estonian (Estonia)",
-        #     "et": "Estonian",
-        #     "ee_GH": "Ewe (Ghana)",
-        #     "ee_TG": "Ewe (Togo)",
-        #     "ee": "Ewe",
-        #     "fa_IR": "()",
-        #     "fo_FO": "Faroese (Faroe Islands)",
-        #     "fo": "Faroese",
-        #     "fil_PH": "Filipino (Philippines)",
-        #     "fil": "Filipino",
-        #     "fi_FI": "Finnish (Finland)",
-        #     "fi": "Finnish",
-        #     "fr_BE": "French (Belgium)",
-        #     "fr_BJ": "French (Benin)",
-        #     "fr_BF": "French (Burkina Faso)",
-        #     "fr_BI": "French (Burundi)",
-        #     "fr_CM": "French (Cameroon)",
-        #     "fr_CA": "French (Canada)",
-        #     "fr_CF": "French (Central African Republic)",
-        #     "fr_TD": "French (Chad)",
-        #     "fr_KM": "French (Comoros)",
-        #     "fr_CG": "French (Congo - Brazzaville)",
-        #     "fr_CD": "French (Congo - Kinshasa)",
-        #     "fr_CI": "French (Côte d’Ivoire)",
-        #     "fr_DJ": "French (Djibouti)",
-        #     "fr_GQ": "French (Equatorial Guinea)",
-        #     "fr_FR": "French (France)",
-        #     "fr_GA": "French (Gabon)",
-        #     "fr_GP": "French (Guadeloupe)",
-        #     "fr_GN": "French (Guinea)",
-        #     "fr_LU": "French (Luxembourg)",
-        #     "fr_MG": "French (Madagascar)",
-        #     "fr_ML": "French (Mali)",
-        #     "fr_MQ": "French (Martinique)",
-        #     "fr_MC": "French (Monaco)",
-        #     "fr_NE": "French (Niger)",
-        #     "fr_RW": "French (Rwanda)",
-        #     "fr_RE": "French (Réunion)",
-        #     "fr_BL": "French (Saint Barthélemy)",
-        #     "fr_MF": "French (Saint Martin)",
-        #     "fr_SN": "French (Senegal)",
-        #     "fr_CH": "French (Switzerland)",
-        #     "fr_TG": "French (Togo)",
-        #     "fr": "French",
-        #     "ff_SN": "Fulah (Senegal)",
-        #     "ff": "Fulah",
-        #     "gl_ES": "Galician (Spain)",
-        #     "gl": "Galician",
-        #     "lg_UG": "Ganda (Uganda)",
-        #     "lg": "Ganda",
-        #     "ka_GE": "Georgian (Georgia)",
-        #     "ka": "Georgian",
-        #     "de_AT": "German (Austria)",
-        #     "de_BE": "German (Belgium)",
-        #     "de_DE": "German (Germany)",
-        #     "de_LI": "German (Liechtenstein)",
-        #     "de_LU": "German (Luxembourg)",
-        #     "de_CH": "German (Switzerland)",
-        #     "de": "German",
-        #     "el_CY": "Greek (Cyprus)",
-        #     "el_GR": "Greek (Greece)",
-        #     "el": "Greek",
-        #     "gu_IN": "Gujarati (India)",
-        #     "gu": "Gujarati",
-        #     "guz_KE": "Gusii (Kenya)",
-        #     "guz": "Gusii",
-        #     "ha_Latn": "Hausa (Latin)",
-        #     "ha_Latn_GH": "Hausa (Latin, Ghana)",
-        #     "ha_Latn_NE": "Hausa (Latin, Niger)",
-        #     "ha_Latn_NG": "Hausa (Latin, Nigeria)",
-        #     "ha": "Hausa",
-        #     "haw_US": "Hawaiian (United States)",
-        #     "haw": "Hawaiian",
-        #     "he_IL": "Hebrew (Israel)",
-        #     "he": "Hebrew",
-        #     "hi_IN": "Hindi (India)",
-        #     "hi": "Hindi",
-        #     "hu_HU": "Hungarian (Hungary)",
-        #     "hu": "Hungarian",
-        #     "is_IS": "Icelandic (Iceland)",
-        #     "is": "Icelandic",
-        #     "ig_NG": "Igbo (Nigeria)",
-        #     "ig": "Igbo",
-        #     "id_ID": "Indonesian (Indonesia)",
-        #     "id": "Indonesian",
-        #     "ga_IE": "Irish (Ireland)",
-        #     "ga": "Irish",
-        #     "it_IT": "Italian (Italy)",
-        #     "it_CH": "Italian (Switzerland)",
-        #     "it": "Italian",
-        #     "ja_JP": "Japanese (Japan)",
-        #     "ja": "Japanese",
-        #     "kea_CV": "Kabuverdianu (Cape Verde)",
-        #     "kea": "Kabuverdianu",
-        #     "kab_DZ": "Kabyle (Algeria)",
-        #     "kab": "Kabyle",
-        #     "kl_GL": "Kalaallisut (Greenland)",
-        #     "kl": "Kalaallisut",
-        #     "kln_KE": "Kalenjin (Kenya)",
-        #     "kln": "Kalenjin",
-        #     "kam_KE": "Kamba (Kenya)",
-        #     "kam": "Kamba",
-        #     "kn_IN": "Kannada (India)",
-        #     "kn": "Kannada",
-        #     "kk_Cyrl": "Kazakh (Cyrillic)",
-        #     "kk_Cyrl_KZ": "Kazakh (Cyrillic, Kazakhstan)",
-        #     "kk": "Kazakh",
-        #     "km_KH": "Khmer (Cambodia)",
-        #     "km": "Khmer",
-        #     "ki_KE": "Kikuyu (Kenya)",
-        #     "ki""": "Kikuyu",
-        #     "rw_RW": "Kinyarwanda (Rwanda)",
-        #     "rw": "Kinyarwanda",
-        #     "kok_IN": "Konkani (India)",
-        #     "kok": "Konkani",
-        #     "ko_KR": "Korean (South Korea)",
-        #     "ko": "Korean",
-        #     "khq_ML": "Koyra Chiini (Mali)",
-        #     "khq": "Koyra Chiini",
-        #     "ses_ML": "Koyraboro Senni (Mali)",
-        #     "ses": "Koyraboro Senni",
-        #     "lag_TZ": "Langi (Tanzania)",
-        #     "lag": "Langi",
-        #     "lv_LV": "Latvian (Latvia)",
-        #     "lv": "Latvian",
-        #     "lt_LT": "Lithuanian (Lithuania)",
-        #     "lt": "Lithuanian",
-        #     "luo_KE": "Luo (Kenya)",
-        #     "luo": "Luo",
-        #     "luy_KE": "Luyia (Kenya)",
-        #     "luy": "Luyia",
-        #     "mk_MK": "Macedonian (Macedonia)",
-        #     "mk": "Macedonian",
-        #     "jmc_TZ": "Machame (Tanzania)",
-        #     "jmc": "Machame",
-        #     "kde_TZ": "Makonde (Tanzania)",
-        #     "kde": "Makonde",
-        #     "mg_MG": "Malagasy (Madagascar)",
-        #     "mg": "Malagasy",
-        #     "ms_BN": "Malay (Brunei)",
-        #     "ms_MY": "Malay (Malaysia)",
-        #     "ms": "Malay",
-        #     "ml_IN": "Malayalam (India)",
-        #     "ml": "Malayalam",
-        #     "mt_MT": "Maltese (Malta)",
-        #     "mt": "Maltese",
-        #     "gv_GB": "Manx (United Kingdom)",
-        #     "gv": "Manx",
-        #     "mr_IN": "Marathi (India)",
-        #     "mr": "Marathi",
-        #     "mas_KE": "Masai (Kenya)",
-        #     "mas_TZ": "Masai (Tanzania)",
-        #     "mas": "Masai",
-        #     "mer_KE": "Meru (Kenya)",
-        #     "mer": "Meru",
-        #     "mfe_MU": "Morisyen (Mauritius)",
-        #     "mfe": "Morisyen",
-        #     "naq_NA": "Nama (Namibia)",
-        #     "naq": "Nama",
-        #     "ne_IN": "Nepali (India)",
-        #     "ne_NP": "Nepali (Nepal)",
-        #     "ne": "Nepali",
-        #     "nd_ZW": "North Ndebele (Zimbabwe)",
-        #     "nd": "North Ndebele",
-        #     "nb_NO": "Norwegian Bokmål (Norway)",
-        #     "nb": "Norwegian Bokmål",
-        #     "nn_NO": "Norwegian Nynorsk (Norway)",
-        #     "nn": "Norwegian Nynorsk",
-        #     "nyn_UG": "Nyankole (Uganda)",
-        #     "nyn": "Nyankole",
-        #     "or_IN": "Oriya (India)",
-        #     "or": "Oriya",
-        #     "om_ET": "Oromo (Ethiopia)",
-        #     "om_KE": "Oromo (Kenya)",
-        #     "om": "Oromo",
-        #     "ps_AF": "Pashto (Afghanistan)",
-        #     "ps": "Pashto",
-        #     "fa_AF": "Persian (Afghanistan)",
-        #     "fa_IR": "Persian (Iran)",
-        #     "fa": "Persian",
-        #     "pl_PL": "Polish (Poland)",
-        #     "pl": "Polish",
-        #     "pt_BR": "Portuguese (Brazil)",
-        #     "pt_GW": "Portuguese (Guinea-Bissau)",
-        #     "pt_MZ": "Portuguese (Mozambique)",
-        #     "pt_PT": "Portuguese (Portugal)",
-        #     "pt": "Portuguese",
-        #     "pa_Arab": "Punjabi (Arabic)",
-        #     "pa_Arab_PK": "Punjabi (Arabic, Pakistan)",
-        #     "pa_Guru": "Punjabi (Gurmukhi)",
-        #     "pa_Guru_IN": "Punjabi (Gurmukhi, India)",
-        #     "pa": "Punjabi",
-        #     "ro_MD": "Romanian (Moldova)",
-        #     "ro_RO": "Romanian (Romania)",
-        #     "ro": "Romanian",
-        #     "rm_CH": "Romansh (Switzerland)",
-        #     "rm": "Romansh",
-        #     "rof_TZ": "Rombo (Tanzania)",
-        #     "rof": "Rombo",
-        #     "ru_MD": "Russian (Moldova)",
-        #     "ru_RU": "Russian (Russia)",
-        #     "ru_UA": "Russian (Ukraine)",
-        #     "ru": "Russian",
-        #     "rwk_TZ": "Rwa (Tanzania)",
-        #     "rwk": "Rwa",
-        #     "saq_KE": "Samburu (Kenya)",
-        #     "saq": "Samburu",
-        #     "sg_CF": "Sango (Central African Republic)",
-        #     "sg": "Sango",
-        #     "seh_MZ": "Sena (Mozambique)",
-        #     "seh": "Sena",
-        #     "sr_Cyrl": "Serbian (Cyrillic)",
-        #     "sr_Cyrl_BA": "Serbian (Cyrillic, Bosnia and Herzegovina)",
-        #     "sr_Cyrl_ME": "Serbian (Cyrillic, Montenegro)",
-        #     "sr_Cyrl_RS": "Serbian (Cyrillic, Serbia)",
-        #     "sr_Latn": "Serbian (Latin)",
-        #     "sr_Latn_BA": "Serbian (Latin, Bosnia and Herzegovina)",
-        #     "sr_Latn_ME": "Serbian (Latin, Montenegro)",
-        #     "sr_Latn_RS": "Serbian (Latin, Serbia)",
-        #     "sr": "Serbian",
-        #     "sn_ZW": "Shona (Zimbabwe)",
-        #     "sn": "Shona",
-        #     "ii_CN": "Sichuan Yi (China)",
-        #     "ii": "Sichuan Yi",
-        #     "si_LK": "Sinhala (Sri Lanka)",
-        #     "si": "Sinhala",
-        #     "sk_SK": "Slovak (Slovakia)",
-        #     "sk": "Slovak",
-        #     "sl_SI": "Slovenian (Slovenia)",
-        #     "sl": "Slovenian",
-        #     "xog_UG": "Soga (Uganda)",
-        #     "xog": "Soga",
-        #     "so_DJ": "Somali (Djibouti)",
-        #     "so_ET": "Somali (Ethiopia)",
-        #     "so_KE": "Somali (Kenya)",
-        #     "so_SO": "Somali (Somalia)",
-        #     "so": "Somali",
-        #     "es_AR": "Spanish (Argentina)",
-        #     "es_BO": "Spanish (Bolivia)",
-        #     "es_CL": "Spanish (Chile)",
-        #     "es_CO": "Spanish (Colombia)",
-        #     "es_CR": "Spanish (Costa Rica)",
-        #     "es_DO": "Spanish (Dominican Republic)",
-        #     "es_EC": "Spanish (Ecuador)",
-        #     "es_SV": "Spanish (El Salvador)",
-        #     "es_GQ": "Spanish (Equatorial Guinea)",
-        #     "es_GT": "Spanish (Guatemala)",
-        #     "es_HN": "Spanish (Honduras)",
-        #     "es_419": "Spanish (Latin America)",
-        #     "es_MX": "Spanish (Mexico)",
-        #     "es_NI": "Spanish (Nicaragua)",
-        #     "es_PA": "Spanish (Panama)",
-        #     "es_PY": "Spanish (Paraguay)",
-        #     "es_PE": "Spanish (Peru)",
-        #     "es_PR": "Spanish (Puerto Rico)",
-        #     "es_ES": "Spanish (Spain)",
-        #     "es_US": "Spanish (United States)",
-        #     "es_UY": "Spanish (Uruguay)",
-        #     "es_VE": "Spanish (Venezuela)",
-        #     "es": "Spanish",
-        #     "sw_KE": "Swahili (Kenya)",
-        #     "sw_TZ": "Swahili (Tanzania)",
-        #     "sw": "Swahili",
-        #     "sv_FI": "Swedish (Finland)",
-        #     "sv_SE": "Swedish (Sweden)",
-        #     "sv": "Swedish",
-        #     "gsw_CH": "Swiss German (Switzerland)",
-        #     "gsw": "Swiss German",
-        #     "shi_Latn": "Tachelhit (Latin)",
-        #     "shi_Latn_MA": "Tachelhit (Latin, Morocco)",
-        #     "shi_Tfng": "Tachelhit (Tifinagh)",
-        #     "shi_Tfng_MA": "Tachelhit (Tifinagh, Morocco)",
-        #     "shi": "Tachelhit",
-        #     "dav_KE": "Taita (Kenya)",
-        #     "dav": "Taita",
-        #     "ta_IN": "Tamil (India)",
-        #     "ta_LK": "Tamil (Sri Lanka)",
-        #     "ta": "Tamil",
-        #     "te_IN": "Telugu (India)",
-        #     "te": "Telugu",
-        #     "teo_KE": "Teso (Kenya)",
-        #     "teo_UG": "Teso (Uganda)",
-        #     "teo": "Teso",
-        #     "th_TH": "Thai (Thailand)",
-        #     "th": "Thai",
-        #     "bo_CN": "Tibetan (China)",
-        #     "bo_IN": "Tibetan (India)",
-        #     "bo": "Tibetan",
-        #     "ti_ER": "Tigrinya (Eritrea)",
-        #     "ti_ET": "Tigrinya (Ethiopia)",
-        #     "ti": "Tigrinya",
-        #     "to_TO": "Tonga (Tonga)",
-        #     "to": "Tonga",
-        #     "tr_TR": "Turkish (Turkey)",
-        #     "tr": "Turkish",
-        #     "uk_UA": "Ukrainian (Ukraine)",
-        #     "uk": "Ukrainian",
-        #     "ur_IN": "Urdu (India)",
-        #     "ur_PK": "Urdu (Pakistan)",
-        #     "ur": "Urdu",
-        #     "uz_Arab": "Uzbek (Arabic)",
-        #     "uz_Arab_AF": "Uzbek (Arabic, Afghanistan)",
-        #     "uz_Cyrl": "Uzbek (Cyrillic)",
-        #     "uz_Cyrl_UZ": "Uzbek (Cyrillic, Uzbekistan)",
-        #     "uz_Latn": "Uzbek (Latin)",
-        #     "uz_Latn_UZ": "Uzbek (Latin, Uzbekistan)",
-        #     "uz": "Uzbek",
-        #     "vi_VN": "Vietnamese (Vietnam)",
-        #     "vi": "Vietnamese",
-        #     "vun_TZ": "Vunjo (Tanzania)",
-        #     "vun": "Vunjo",
-        #     "cy_GB": "Welsh (United Kingdom)",
-        #     "cy": "Welsh",
-        #     "yo_NG": "Yoruba (Nigeria)",
-        #     "yo": "Yoruba",
-        #     "zu_ZA": "Zulu (South Africa)",
-        #     "zu": "Zulu"
-        # }
-        # voices = {'Rachel': '21m00Tcm4TlvDq8ikWAM', 'Drew': '29vD33N1CtxCmqQRPOHJ', 'Clyde': '2EiwWnXFnvU5JabPnv8n',
-        #           'Paul': '5Q0t7uMcjvnagumLfvZi', 'Domi': 'AZnzlk1XvdvUeBnXmlld', 'Dave': 'CYw3kZ02Hs0563khs1Fj',
-        #           'Fin': 'D38z5RcWu1voky8WS1ja', 'Sarah': 'EXAVITQu4vr4xnSDxMaL', 'Antoni': 'ErXwobaYiN019PkySvjV',
-        #           'Thomas': 'GBv7mTt0atIp3Br8iCZE', 'Charlie': 'IKne3meq5aSn9XLyUdCD', 'George': 'JBFqnCBsd6RMkjVDRZzb',
-        #           'Emily': 'LcfcDJNUP1GQjkzn1xUU', 'Elli': 'MF3mGyEYCl7XYWbV9V6O', 'Callum': 'N2lVS1w4EtoT3dr4eOWO',
-        #           'Patrick': 'ODq5zmih8GrVes37Dizd', 'Harry': 'SOYHLrjzK2X1ezoPC6cr', 'Liam': 'TX3LPaxmHKxFdv7VOQHJ',
-        #           'Dorothy': 'ThT5KcBeYPX3keUQqHPh', 'Josh': 'TxGEqnHWrfWFTfGW9XjX', 'Arnold': 'VR6AewLTigWG4xSOukaG',
-        #           'Charlotte': 'XB0fDUnXU5powFXDhCwa', 'Alice': 'Xb7hH8MSUJpSbSDYk0k2',
-        #           'Matilda': 'XrExE9yKIg1WjnnlVkGX', 'Matthew': 'Yko7PKHZNXotIFUBG7I9', 'James': 'ZQe5CZNOzWyzPSCn5a3c',
-        #           'Joseph': 'Zlb1dXrM653N07WRdFW3', 'Jeremy': 'bVMeCyTHy58xNoL34h3p', 'Michael': 'flq6f7yk4E4fJM5XTYuZ',
-        #           'Ethan': 'g5CIjZEefAph4nQFvHAz', 'Chris': 'iP95p4xoKVk53GoZ742B', 'Gigi': 'jBpfuIE2acCO8z3wKNLl',
-        #           'Freya': 'jsCqWAovK2LkecY7zXl4', 'Brian': 'nPczCjzI2devNBz1zQrb', 'Grace': 'oWAxZDx7w5VEj9dCyTzz',
-        #           'Daniel': 'onwK4e9ZLuTAKqWW03F9', 'Lily': 'pFZP5JQG7iQjIQuC4Bku', 'Serena': 'pMsXgVXv3BLzUgSXRplE',
-        #           'Adam': 'pNInz6obpgDQGcFmaJgB', 'Nicole': 'piTKgcLEGmPE4e6mEKli', 'Bill': 'pqHfZKP75CvOlQylNhV4',
-        #           'Jessie': 't0jbNlBVZ17f02VDIeMI', 'Sam': 'yoZ06aMxZJJ28mfd3POQ', 'Glinda': 'z9fAnlkpzviPz146aGWa',
-        #           'Giovanni': 'zcAOhNBS3c14rBihAFp1', 'Mimi': 'zrHiDhphv9ZnVXBqCLjz'}
-        #
-        # # for num in range(data_length):
-        # #     print(num)
-        # #     #     print(data[num]['name'])
-        # #     #     print(data[num]['voice_id'])
-        # #     voices[f"{data[num]['name']}"] = f"{data[num]['voice_id']}"
-        # # # int("".join(request.url.split('=')[1]))
-        # # print(voices)
-        #
-
         headers = {
             "accept": "application/json",
             "content-type": "application/json",
-
-            "X-API-KEY": os.environ.get('X-API-KEY'),
+            "X-API-KEY": "7c8b99eb-415a-4eb6-a27a-9bf2f575f745"
+            # "X-API-KEY": os.environ.get('X-API-KEY'),
         }
-
 
         # GET Speakers
         speakers = requests.get(f"{URL}/api/v1/speakers", headers=headers).json()
         data = speakers['data']
 
-
         data_length = int(speakers["totalCount"])
 
-        # to make a dict include languages and locales
-        # di = {}
-        # for num in range(data_length):
-        #     dat = data[num]['locale'].replace('-', "_")
-        #     # if d not in locale_list:
-        #     try:
-        #         di[LANGUAGE_BY_LOCALE[dat]] = data[num]['id']
-        #     except KeyError:
-        #         print(f'{dat} does not exist.')
         di = {'Kannada (India)': '63b4094e241a82001d51c602', 'Telugu (India)': '63b41807241a82001d51df88',
               'Amharic (Ethiopia)': '63b40683241a82001d51b026', 'Arabic (Lebanon)': '63b406a8241a82001d51b08b',
               'Pashto (Afghanistan)': '63b409b7241a82001d51c704', 'Malayalam (India)': '63b40977241a82001d51c668',
@@ -1132,76 +655,12 @@ def tts():
               'Arabic (Syria)': '63b406c3241a82001d51b0d7', 'Greek (Greece)': '63b40729241a82001d51b655',
               'Bengali (Bangladesh)': '63b406d9241a82001d51b11e', 'Arabic (Algeria)': '63b40690241a82001d51b04b'}
 
-        # def merge_dicts(*dicts):
-        #     """
-        #     Merges dictionaries, retaining values for duplicate keys.
-        #     Args:
-        #         *dicts: Variable number of dictionaries to merge.
-        #     Returns:
-        #         dict: A new dictionary with lists of values for duplicate keys.
-        #     """
-        #     result = collections.defaultdict(list)
-        #     for d in dicts:
-        #         for k, v in d.items():
-        #             result[k].append(v)
-        #     return dict(result)
-        #
-        # # Example usage:
-        # # d1 = {'a': 1, 'b': 2}
-        # # d2 = {'c': 3, 'b': 4}
-        # # d3 = {'a': 5, 'd': 6}
-        #
-        # new_dict = merge_dicts(di)
-        # print(new_dict)
 
-
-        # for loc in locale_list:
-        #     try:
-        #         print(LANGUAGE_BY_LOCALE[loc])
-        #     except KeyError:
-        #         print(f'{loc} does not exist.')
-
-
-        # print(f'Fetched a total of # {speakers["totalCount"]} speakers!')
         sound_url = None
         if request.method == 'POST':
-            # selected_voice_num = int(request.form['voice_num'])
-            # speaker_id = speakers['data'][selected_voice_num]['id']
+
             speaker_id = request.form['voice_num']
-            # print(f'The speaker ID we will use is {speaker_id}')
-            # print(selected_voice_id)
-            # print(request.form['voice_num'])
-            # print(request.form['textarea'])
-            # Text to speech
-            #     CHUNK_SIZE = 1024
-            #     url = f"https://api.elevenlabs.io/v1/text-to-speech/{selected_voice_id}"
-            #
-            #     headers = {
-            #         "Accept": "audio/mpeg",
-            #         "Content-Type": "application/json",
-            #         "xi-api-key": os.environ.get('xi-api-key')
-            #     }
-            #
-            #     data = {
-            #         "text": request.form['textarea'],
-            #         "model_id": "eleven_monolingual_v1",
-            #         "voice_settings": {
-            #             "stability": 0.5,
-            #             "similarity_boost": 0.5
-            #         }
-            #     }
-            #
-            #     response = requests.post(url, json=data, headers=headers)
-            #     with open("./static/output.mp3", "wb") as f:
-            #         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-            #             if chunk:
-            #                 f.write(chunk)
 
-            # You can find specific speakerId with the below using the displayName you can see in Genny Web.
-            # speaker_found = next(filter(lambda speaker: speaker['displayName'] == 'Chloe Woods', speakers['data']), None)
-            # print(speaker_found)
-
-            # POST TTS (Async)
             tts_body = {
                 "speaker": speaker_id,
                 "text": request.form['textarea']
@@ -1209,7 +668,6 @@ def tts():
 
             tts_job = requests.post(f"{URL}/api/v1/tts", headers=headers, data=json.dumps(tts_body)).json()
             job_id = tts_job['id']
-            # print(f'TTS Job is created with ID: {job_id}')
 
             # GET JOB - Fetch until TTS Job is complete
             job_complete = False
