@@ -12,7 +12,7 @@ def get_audio(msg):
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "X-API-KEY": os.environ.get('X-API-KEY')
+        "X-API-KEY": '7c8b99eb-415a-4eb6-a27a-9bf2f575f745'
         # "X-API-KEY": os.environ.get('X-API-KEY'),
     }
 
@@ -48,8 +48,8 @@ def get_audio(msg):
 
     return f"{tts_url}"
 
-sound = requests.get(url=get_audio('hello world'))
-print(sound.url)
+# sound = requests.get(url=get_audio('hello world'))
+# print(sound.url)
 
 # with open('./x.wav', mode='wb') as file:
 #     file.write(sound.content)

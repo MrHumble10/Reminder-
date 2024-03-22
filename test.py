@@ -1,6 +1,10 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, abort
 # from flask_ckeditor import CKEditor
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from flask_wtf import FlaskForm
+from wtforms import FileField, SubmitField
+from wtforms.validators import InputRequired
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user
 from notification import send_email, send_sms
 import os
@@ -12,6 +16,7 @@ import calendar
 import requests
 import time
 import json
+import PyPDF2
 import collections
 
 # j_url = "https://api.elevenlabs.io/v1/voices"
@@ -29,9 +34,9 @@ EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-
+# os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
-
+app.config['UPLOAD_FILE'] = './static/files'
 # Bootstrap5(app)
 
 db = SQLAlchemy()
@@ -88,6 +93,11 @@ def load_user(user_id):
     return db.get_or_404(User, user_id)
 
 
+# class UploadFileForm(FlaskForm):
+#     file = FileField('File', validators=[InputRequired()])
+#     submit = SubmitField('Upload File')
+
+
 class Todos(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
@@ -106,6 +116,13 @@ class Done(UserMixin, db.Model):
     due_date = db.Column(db.String)
     done = db.Column(db.Boolean, nullable=True)
     favorites = db.Column(db.Boolean)
+
+
+class MultimediaFile(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.LargeBinary, nullable=True)
 
 
 class User(UserMixin, db.Model):
@@ -154,6 +171,7 @@ def register():
             return redirect(url_for('home'))
     return render_template("register.html")
 
+
 @app.route("/email123456789")
 def admin_email():
     result = db.session.execute(db.select(Todos))
@@ -185,9 +203,6 @@ def admin_email():
                      f"To know more details https://myreminder.onrender.com Click here."
                      f"Your TODO List:\n"
                      f"{item.info}\n", tel=user.tel)
-
-
-
 
     return render_template('login.html')
 
@@ -655,7 +670,6 @@ def tts():
               'Arabic (Syria)': '63b406c3241a82001d51b0d7', 'Greek (Greece)': '63b40729241a82001d51b655',
               'Bengali (Bangladesh)': '63b406d9241a82001d51b11e', 'Arabic (Algeria)': '63b40690241a82001d51b04b'}
 
-
         sound_url = None
         if request.method == 'POST':
 
@@ -691,6 +705,69 @@ def tts():
     else:
         flash("login please")
         return redirect(url_for('login'))
+
+
+@app.route("/pdf-to-speech", methods=['GET', "POST"])
+def pdf_to_speech():
+    try:
+        os.mkdir(f"{os.path.join(os.path.abspath(os.path.dirname('__file__')))}/{app.config['UPLOAD_FILE']}")
+    except FileExistsError:
+        pass
+    # related to file upload
+    if 'file' in request.files:
+        file = request.files['file']
+        if file:
+            file.save(
+                os.path.join(os.path.abspath(os.path.dirname('__file__')), app.config['UPLOAD_FILE'],
+                             secure_filename(file.filename)))
+            # from pdfquery import PDFQuery
+            #
+            # pdf_path = f'./static/files/{file.filename}'
+            # pdf = PDFQuery(pdf_path)
+            # pdf.load()
+            #
+            # # Use CSS-like selectors to locate text elements
+            # text_elements = pdf.pq('LTTextLineHorizontal')
+            # # Extract the text from the elements
+            # extracted_text = "".join([t.text for t in text_elements])
+            # print(extracted_text)
+
+
+
+            # Open the PDF file
+            pdf_file = open(f'./static/files/{file.filename}', 'rb')
+
+            # Create a PDF reader object
+            pdf_reader = PyPDF2.PdfFileReader(pdf_file)
+
+            # Get the number of pages in the PDF file
+            num_pages = pdf_reader.numPages
+            t = ''
+            # Loop through all the pages and extract the text
+            for page in range(num_pages):
+                page_obj = pdf_reader.getPage(page)
+                print(page_obj.extractText())
+                t += page_obj.extractText()
+            # Close the PDF file
+            pdf_file.close()
+
+
+            return render_template('pdf-to-speech.html', text=t)
+        return 'No file provided.'
+    return render_template('pdf-to-speech.html')
+
+    # form = UploadFileForm()
+    # if form.validate_on_submit():
+    #     file = form.file.data
+    #     print(file)
+    #     # with open(file, mode='rb') as f:
+    #     #     file_content = f.read()
+    #     # print(file_content)
+    #     # file.save(os.path.join(os.path.abspath(os.path.dirname('__file__')), app.config['SQLALCHEMY_DATABASE_URI'],
+    #     #                        secure_filename(file.filename)))
+    #     print(os.path.join(os.path.abspath(os.path.dirname("__file__"))))
+    #     return "File has been Uploaded"
+    # return render_template('pdf-to-speech.html', form=form)
 
 
 if __name__ == "__main__":
