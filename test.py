@@ -590,10 +590,44 @@ def logout():
 @app.route("/text-to-speech", methods=["GET", "POST"])
 def tts():
     if current_user.is_authenticated:
+
+        try:
+            os.mkdir(f"{os.path.join(os.path.abspath(os.path.dirname('__file__')))}/{app.config['UPLOAD_FILE']}")
+        except FileExistsError:
+            pass
+        t = ''
+        # related to file upload
+        if 'file' in request.files:
+            file = request.files['file']
+            if file:
+                file.save(
+                    os.path.join(os.path.abspath(os.path.dirname('__file__')), app.config['UPLOAD_FILE'],
+                                 secure_filename(file.filename)))
+
+                # Open the PDF file
+                pdf_file = open(f'./static/files/{file.filename}', 'rb')
+
+                # Create a PDF reader object
+                pdf_reader = PyPDF2.PdfFileReader(pdf_file)
+
+                # Get the number of pages in the PDF file
+                num_pages = pdf_reader.numPages
+
+                # Loop through all the pages and extract the text
+                for page in range(num_pages):
+                    page_obj = pdf_reader.getPage(page)
+                    # print(page_obj.extractText())
+                    t += page_obj.extractText()
+                # Close the PDF file
+                pdf_file.close()
+
+
+
+
         headers = {
             "accept": "application/json",
             "content-type": "application/json",
-            "X-API-KEY": "7c8b99eb-415a-4eb6-a27a-9bf2f575f745"
+            "X-API-KEY": os.environ.get('X-API-KEY')
             # "X-API-KEY": os.environ.get('X-API-KEY'),
         }
 
@@ -672,8 +706,11 @@ def tts():
 
         sound_url = None
         if request.method == 'POST':
-
-            speaker_id = request.form['voice_num']
+            try:
+                speaker_id = request.form['voice_num']
+            except KeyError:
+                flash('please select a voice')
+                return redirect(f'/text-to-speech#Select')
 
             tts_body = {
                 "speaker": speaker_id,
@@ -700,8 +737,10 @@ def tts():
                     tts_url = job_res['data'][0]['urls'][0]
 
             # print(f'TTS file is available at: {tts_url}')
-            return render_template('TTS.html', sound_url=tts_url, data=data, data_length=data_length, di=di)
-        return render_template('TTS.html', data=data, data_length=data_length, sound_url=sound_url, di=di)
+            return render_template('TTS.html', sound_url=tts_url, data=data, data_length=data_length,
+                                   di=di, text=t)
+        return render_template('TTS.html', data=data, data_length=data_length, sound_url=sound_url,
+                               di=di, text=t)
     else:
         flash("login please")
         return redirect(url_for('login'))
@@ -720,19 +759,6 @@ def pdf_to_speech():
             file.save(
                 os.path.join(os.path.abspath(os.path.dirname('__file__')), app.config['UPLOAD_FILE'],
                              secure_filename(file.filename)))
-            # from pdfquery import PDFQuery
-            #
-            # pdf_path = f'./static/files/{file.filename}'
-            # pdf = PDFQuery(pdf_path)
-            # pdf.load()
-            #
-            # # Use CSS-like selectors to locate text elements
-            # text_elements = pdf.pq('LTTextLineHorizontal')
-            # # Extract the text from the elements
-            # extracted_text = "".join([t.text for t in text_elements])
-            # print(extracted_text)
-
-
 
             # Open the PDF file
             pdf_file = open(f'./static/files/{file.filename}', 'rb')
@@ -746,15 +772,13 @@ def pdf_to_speech():
             # Loop through all the pages and extract the text
             for page in range(num_pages):
                 page_obj = pdf_reader.getPage(page)
-                print(page_obj.extractText())
+                # print(page_obj.extractText())
                 t += page_obj.extractText()
             # Close the PDF file
             pdf_file.close()
-
-
-            return render_template('pdf-to-speech.html', text=t)
-        return 'No file provided.'
-    return render_template('pdf-to-speech.html')
+            return render_template('TTS.html', text=t)
+        return flash('No file provided.')
+    return render_template('TTS.html')
 
     # form = UploadFileForm()
     # if form.validate_on_submit():
