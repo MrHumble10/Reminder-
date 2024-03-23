@@ -19,6 +19,73 @@ import json
 import PyPDF2
 import collections
 
+di = {'Kannada (India)': '63b4094e241a82001d51c602', 'Telugu (India)': '63b41807241a82001d51df88',
+              'Amharic (Ethiopia)': '63b40683241a82001d51b026', 'Arabic (Lebanon)': '63b406a8241a82001d51b08b',
+              'Pashto (Afghanistan)': '63b409b7241a82001d51c704', 'Malayalam (India)': '63b40977241a82001d51c668',
+              'English (United Kingdom)': '63b4075a241a82001d51b70a', 'Arabic (Libya)': '63b406ad241a82001d51b098',
+              'Spanish (Nicaragua)': '63b4085f241a82001d51c366', 'German (Germany)': '63b4070d241a82001d51b5f5',
+              'German (Switzerland)': '63b40703241a82001d51b19a', 'Dutch (Netherlands)': '63b409ac241a82001d51c6e6',
+              'Portuguese (Brazil)': '63b409c3241a82001d51c722', 'Tamil (Sri Lanka)': '63b417f6241a82001d51df5e',
+              'Spanish (Mexico)': '63b40855241a82001d51c34a', 'Swedish (Sweden)': '63b417aa241a82001d51dee1',
+              'Arabic (Egypt)': '63b40693241a82001d51b051', 'Hindi (India)': '63b408e9241a82001d51c506',
+              'Swahili (Kenya)': '63b417b0241a82001d51def3', 'French (France)': '63b408cf241a82001d51c4b6',
+              'Afrikaans (South Africa)': '63b403ee241a82001d51a9c7', 'Spanish (Spain)': '63b4081b241a82001d51c2b6',
+              'Italian (Italy)': '63b4090d241a82001d51c566', 'Spanish (Puerto Rico)': '63b4086e241a82001d51c38a',
+              'English (United States)': '640f477e2babeb0024be4237', 'Catalan (Spain)': '63b406e9241a82001d51b149',
+              'English (Australia)': '63b40744241a82001d51b6c2', 'Filipino (Philippines)': '64e2f75736fe21ca612f1637',
+              'English (Philippines)': '63b40792241a82001d51b941', 'Spanish (Ecuador)': '63b40805241a82001d51c263',
+              'Irish (Ireland)': '63b408d7241a82001d51c4cc', 'Finnish (Finland)': '63b40899241a82001d51c42c',
+              'French (Canada)': '64e2f75c36fe21ca612f1657', 'English (Ireland)': '63b4077b241a82001d51b904',
+              'Arabic (Kuwait)': '63b406a1241a82001d51b079', 'Korean (South Korea)': '65c0b9a4eb1a522a539db0e8',
+              'Armenian (Armenia)': '63b408f8241a82001d51c52a', 'Ukrainian (Ukraine)': '63b41818241a82001d51dfb2',
+              'Dutch (Belgium)': '63b409a4241a82001d51c6d4', 'Gujarati (India)': '63b408e1241a82001d51c4ee',
+              'Tamil (India)': '63b417b9241a82001d51df0b', 'Georgian (Georgia)': '63b4093e241a82001d51c5de',
+              'Arabic (Iraq)': '63b40698241a82001d51b05e', 'Hebrew (Israel)': '63b408e6241a82001d51c4fa',
+              'Somali (Somalia)': '63b4176c241a82001d51de97', 'Japanese (Japan)': '64e2f75436fe21ca612f1627',
+              'Indonesian (Indonesia)': '63b408fd241a82001d51c536', 'Estonian (Estonia)': '63b4088d241a82001d51c40a',
+              'Nepali (Nepal)': '63b4099b241a82001d51c6c2', 'Portuguese (Portugal)': '63b409e6241a82001d51c770',
+              'English (New Zealand)': '63b40790241a82001d51b93b', 'Macedonian (Macedonia)': '63b40975241a82001d51c662',
+              'Swahili (Tanzania)': '63b417b5241a82001d51deff', 'Persian (Iran)': '63b40894241a82001d51c420',
+              'Persian (Iran) Male': '63b40896241a82001d51c426',
+              'Danish (Denmark)': '63b406f7241a82001d51b16d', 'Zulu (South Africa)': '63b41883241a82001d51e1e1',
+              'Albanian (Albania)': '63b4179f241a82001d51dec3', 'Welsh (United Kingdom)': '63b406f4241a82001d51b167',
+              'Spanish (United States)': '64e2f74b36fe21ca612f15eb', 'Thai (Thailand)': '63b4180b241a82001d51df94',
+              'Spanish (Guatemala)': '63b40831241a82001d51c2ec', 'Khmer (Cambodia)': '63b40949241a82001d51c5f6',
+              'English (Singapore)': '63b40797241a82001d51b94d', 'Galician (Spain)': '63b408da241a82001d51c4dc',
+              'English (South Africa)': '63b407dd241a82001d51b9fb', 'Romanian (Romania)': '63b409e9241a82001d51c776',
+              'Bulgarian (Bulgaria)': '63b406d6241a82001d51b118',
+              'Burmese (Myanmar [Burma])': '63b4098f241a82001d51c6a4', 'Arabic (Tunisia)': '63b406c5241a82001d51b0dd',
+              'Spanish (Bolivia)': '63b407e7241a82001d51ba13',
+              'Spanish (Equatorial Guinea)': '63b4082d241a82001d51c2e0', 'English (Canada)': '63b40754241a82001d51b6fe',
+              'Turkish (Turkey)': '63b41812241a82001d51dfa6', 'Hungarian (Hungary)': '63b408f0241a82001d51c518',
+              'Bosnian (Bosnia and Herzegovina)': '63b406e2241a82001d51b136',
+              'Polish (Poland)': '63b409af241a82001d51c6ec', 'Arabic (Qatar)': '63b406b8241a82001d51b0b8',
+              'Urdu (India)': '63b4181d241a82001d51dfbe', 'Arabic (Jordan)': '63b4069f241a82001d51b073',
+              'Arabic (Bahrain)': '63b4068a241a82001d51b039', 'Spanish (Chile)': '63b407f0241a82001d51ba25',
+              'Icelandic (Iceland)': '63b40901241a82001d51c542',
+              'Spanish (Dominican Republic)': '63b407fd241a82001d51c023',
+              'Russian (Russia)': '63b409ee241a82001d51c788', 'Bengali (India)': '63b406df241a82001d51b130',
+              'Spanish (Costa Rica)': '63b407f4241a82001d51ba38', 'Arabic (Morocco)': '63b406b1241a82001d51b0a5',
+              'Urdu (Pakistan)': '63b41821241a82001d51dfca', 'Slovak (Slovakia)': '63b409fa241a82001d51c7a6',
+              'English (Hong Kong SAR China)': '63b40777241a82001d51b8f8',
+              'Norwegian Bokmål (Norway)': '63b40997241a82001d51c6b6',
+              'Vietnamese (Vietnam)': '63b41828241a82001d51dfdc', 'Spanish (Argentina)': '63b407e4241a82001d51ba0d',
+              'English (India)': '63b40781241a82001d51b916', 'Arabic (Oman)': '63b406b5241a82001d51b0b2',
+              'Spanish (El Salvador)': '63b40877241a82001d51c3a2', 'Czech (Czech Republic)': '63b406ed241a82001d51b155',
+              'Spanish (Honduras)': '63b40836241a82001d51c2f8', 'Spanish (Paraguay)': '63b40873241a82001d51c396',
+              'Sinhala (Sri Lanka)': '63b409f4241a82001d51c79a', 'Croatian (Croatia)': '63b408ee241a82001d51c512',
+              'German (Austria)': '63b406fe241a82001d51b189', 'Spanish (Uruguay)': '63b40881241a82001d51c3be',
+              'Spanish (Panama)': '63b40864241a82001d51c372', 'Maltese (Malta)': '63b4098d241a82001d51c69e',
+              'Spanish (Colombia)': '63b407f3241a82001d51ba32', 'French (Belgium)': '63b408a7241a82001d51c450',
+              'French (Switzerland)': '63b408b0241a82001d51c468', 'Arabic (Saudi Arabia)': '63b406bb241a82001d51b0c4',
+              'Arabic (United Arab Emirates)': '63b40685241a82001d51b02c', 'Arabic (Yemen)': '63b406ca241a82001d51b0f2',
+              'Spanish (Venezuela)': '63b40886241a82001d51c3ca', 'Spanish (Peru)': '63b40869241a82001d51c37e',
+              'Basque (Spain)': '63b4088f241a82001d51c414', 'Marathi (India)': '63b40980241a82001d51c680',
+              'Latvian (Latvia)': '63b4096e241a82001d51c650', 'Slovenian (Slovenia)': '63b409ff241a82001d51c7b2',
+              'Lithuanian (Lithuania)': '63b4096c241a82001d51c64a', 'Malay (Malaysia)': '63b40984241a82001d51c68c',
+              'Arabic (Syria)': '63b406c3241a82001d51b0d7', 'Greek (Greece)': '63b40729241a82001d51b655',
+              'Bengali (Bangladesh)': '63b406d9241a82001d51b11e', 'Arabic (Algeria)': '63b40690241a82001d51b04b'}
+
 # j_url = "https://api.elevenlabs.io/v1/voices"
 URL = "https://api.genny.lovo.ai"
 # TODAY = str(dt.datetime.now().strftime('%Y-%m-%d'))
@@ -621,9 +688,6 @@ def tts():
                 # Close the PDF file
                 pdf_file.close()
 
-
-
-
         headers = {
             "accept": "application/json",
             "content-type": "application/json",
@@ -637,72 +701,7 @@ def tts():
 
         data_length = int(speakers["totalCount"])
 
-        di = {'Kannada (India)': '63b4094e241a82001d51c602', 'Telugu (India)': '63b41807241a82001d51df88',
-              'Amharic (Ethiopia)': '63b40683241a82001d51b026', 'Arabic (Lebanon)': '63b406a8241a82001d51b08b',
-              'Pashto (Afghanistan)': '63b409b7241a82001d51c704', 'Malayalam (India)': '63b40977241a82001d51c668',
-              'English (United Kingdom)': '63b4075a241a82001d51b70a', 'Arabic (Libya)': '63b406ad241a82001d51b098',
-              'Spanish (Nicaragua)': '63b4085f241a82001d51c366', 'German (Germany)': '63b4070d241a82001d51b5f5',
-              'German (Switzerland)': '63b40703241a82001d51b19a', 'Dutch (Netherlands)': '63b409ac241a82001d51c6e6',
-              'Portuguese (Brazil)': '63b409c3241a82001d51c722', 'Tamil (Sri Lanka)': '63b417f6241a82001d51df5e',
-              'Spanish (Mexico)': '63b40855241a82001d51c34a', 'Swedish (Sweden)': '63b417aa241a82001d51dee1',
-              'Arabic (Egypt)': '63b40693241a82001d51b051', 'Hindi (India)': '63b408e9241a82001d51c506',
-              'Swahili (Kenya)': '63b417b0241a82001d51def3', 'French (France)': '63b408cf241a82001d51c4b6',
-              'Afrikaans (South Africa)': '63b403ee241a82001d51a9c7', 'Spanish (Spain)': '63b4081b241a82001d51c2b6',
-              'Italian (Italy)': '63b4090d241a82001d51c566', 'Spanish (Puerto Rico)': '63b4086e241a82001d51c38a',
-              'English (United States)': '640f477e2babeb0024be4237', 'Catalan (Spain)': '63b406e9241a82001d51b149',
-              'English (Australia)': '63b40744241a82001d51b6c2', 'Filipino (Philippines)': '64e2f75736fe21ca612f1637',
-              'English (Philippines)': '63b40792241a82001d51b941', 'Spanish (Ecuador)': '63b40805241a82001d51c263',
-              'Irish (Ireland)': '63b408d7241a82001d51c4cc', 'Finnish (Finland)': '63b40899241a82001d51c42c',
-              'French (Canada)': '64e2f75c36fe21ca612f1657', 'English (Ireland)': '63b4077b241a82001d51b904',
-              'Arabic (Kuwait)': '63b406a1241a82001d51b079', 'Korean (South Korea)': '65c0b9a4eb1a522a539db0e8',
-              'Armenian (Armenia)': '63b408f8241a82001d51c52a', 'Ukrainian (Ukraine)': '63b41818241a82001d51dfb2',
-              'Dutch (Belgium)': '63b409a4241a82001d51c6d4', 'Gujarati (India)': '63b408e1241a82001d51c4ee',
-              'Tamil (India)': '63b417b9241a82001d51df0b', 'Georgian (Georgia)': '63b4093e241a82001d51c5de',
-              'Arabic (Iraq)': '63b40698241a82001d51b05e', 'Hebrew (Israel)': '63b408e6241a82001d51c4fa',
-              'Somali (Somalia)': '63b4176c241a82001d51de97', 'Japanese (Japan)': '64e2f75436fe21ca612f1627',
-              'Indonesian (Indonesia)': '63b408fd241a82001d51c536', 'Estonian (Estonia)': '63b4088d241a82001d51c40a',
-              'Nepali (Nepal)': '63b4099b241a82001d51c6c2', 'Portuguese (Portugal)': '63b409e6241a82001d51c770',
-              'English (New Zealand)': '63b40790241a82001d51b93b', 'Macedonian (Macedonia)': '63b40975241a82001d51c662',
-              'Swahili (Tanzania)': '63b417b5241a82001d51deff', 'Persian (Iran)': '63b40894241a82001d51c420',
-              'Persian (Iran) Male': '63b40896241a82001d51c426',
-              'Danish (Denmark)': '63b406f7241a82001d51b16d', 'Zulu (South Africa)': '63b41883241a82001d51e1e1',
-              'Albanian (Albania)': '63b4179f241a82001d51dec3', 'Welsh (United Kingdom)': '63b406f4241a82001d51b167',
-              'Spanish (United States)': '64e2f74b36fe21ca612f15eb', 'Thai (Thailand)': '63b4180b241a82001d51df94',
-              'Spanish (Guatemala)': '63b40831241a82001d51c2ec', 'Khmer (Cambodia)': '63b40949241a82001d51c5f6',
-              'English (Singapore)': '63b40797241a82001d51b94d', 'Galician (Spain)': '63b408da241a82001d51c4dc',
-              'English (South Africa)': '63b407dd241a82001d51b9fb', 'Romanian (Romania)': '63b409e9241a82001d51c776',
-              'Bulgarian (Bulgaria)': '63b406d6241a82001d51b118',
-              'Burmese (Myanmar [Burma])': '63b4098f241a82001d51c6a4', 'Arabic (Tunisia)': '63b406c5241a82001d51b0dd',
-              'Spanish (Bolivia)': '63b407e7241a82001d51ba13',
-              'Spanish (Equatorial Guinea)': '63b4082d241a82001d51c2e0', 'English (Canada)': '63b40754241a82001d51b6fe',
-              'Turkish (Turkey)': '63b41812241a82001d51dfa6', 'Hungarian (Hungary)': '63b408f0241a82001d51c518',
-              'Bosnian (Bosnia and Herzegovina)': '63b406e2241a82001d51b136',
-              'Polish (Poland)': '63b409af241a82001d51c6ec', 'Arabic (Qatar)': '63b406b8241a82001d51b0b8',
-              'Urdu (India)': '63b4181d241a82001d51dfbe', 'Arabic (Jordan)': '63b4069f241a82001d51b073',
-              'Arabic (Bahrain)': '63b4068a241a82001d51b039', 'Spanish (Chile)': '63b407f0241a82001d51ba25',
-              'Icelandic (Iceland)': '63b40901241a82001d51c542',
-              'Spanish (Dominican Republic)': '63b407fd241a82001d51c023',
-              'Russian (Russia)': '63b409ee241a82001d51c788', 'Bengali (India)': '63b406df241a82001d51b130',
-              'Spanish (Costa Rica)': '63b407f4241a82001d51ba38', 'Arabic (Morocco)': '63b406b1241a82001d51b0a5',
-              'Urdu (Pakistan)': '63b41821241a82001d51dfca', 'Slovak (Slovakia)': '63b409fa241a82001d51c7a6',
-              'English (Hong Kong SAR China)': '63b40777241a82001d51b8f8',
-              'Norwegian Bokmål (Norway)': '63b40997241a82001d51c6b6',
-              'Vietnamese (Vietnam)': '63b41828241a82001d51dfdc', 'Spanish (Argentina)': '63b407e4241a82001d51ba0d',
-              'English (India)': '63b40781241a82001d51b916', 'Arabic (Oman)': '63b406b5241a82001d51b0b2',
-              'Spanish (El Salvador)': '63b40877241a82001d51c3a2', 'Czech (Czech Republic)': '63b406ed241a82001d51b155',
-              'Spanish (Honduras)': '63b40836241a82001d51c2f8', 'Spanish (Paraguay)': '63b40873241a82001d51c396',
-              'Sinhala (Sri Lanka)': '63b409f4241a82001d51c79a', 'Croatian (Croatia)': '63b408ee241a82001d51c512',
-              'German (Austria)': '63b406fe241a82001d51b189', 'Spanish (Uruguay)': '63b40881241a82001d51c3be',
-              'Spanish (Panama)': '63b40864241a82001d51c372', 'Maltese (Malta)': '63b4098d241a82001d51c69e',
-              'Spanish (Colombia)': '63b407f3241a82001d51ba32', 'French (Belgium)': '63b408a7241a82001d51c450',
-              'French (Switzerland)': '63b408b0241a82001d51c468', 'Arabic (Saudi Arabia)': '63b406bb241a82001d51b0c4',
-              'Arabic (United Arab Emirates)': '63b40685241a82001d51b02c', 'Arabic (Yemen)': '63b406ca241a82001d51b0f2',
-              'Spanish (Venezuela)': '63b40886241a82001d51c3ca', 'Spanish (Peru)': '63b40869241a82001d51c37e',
-              'Basque (Spain)': '63b4088f241a82001d51c414', 'Marathi (India)': '63b40980241a82001d51c680',
-              'Latvian (Latvia)': '63b4096e241a82001d51c650', 'Slovenian (Slovenia)': '63b409ff241a82001d51c7b2',
-              'Lithuanian (Lithuania)': '63b4096c241a82001d51c64a', 'Malay (Malaysia)': '63b40984241a82001d51c68c',
-              'Arabic (Syria)': '63b406c3241a82001d51b0d7', 'Greek (Greece)': '63b40729241a82001d51b655',
-              'Bengali (Bangladesh)': '63b406d9241a82001d51b11e', 'Arabic (Algeria)': '63b40690241a82001d51b04b'}
+
 
         sound_url = None
         if request.method == 'POST':
@@ -718,7 +717,11 @@ def tts():
             }
 
             tts_job = requests.post(f"{URL}/api/v1/tts", headers=headers, data=json.dumps(tts_body)).json()
-            job_id = tts_job['id']
+            try:
+                job_id = tts_job['id']
+            except KeyError:
+                flash('please select a voice')
+                return redirect(f'/text-to-speech#Select')
 
             # GET JOB - Fetch until TTS Job is complete
             job_complete = False
@@ -735,6 +738,7 @@ def tts():
                 else:
                     job_complete = True
                     tts_url = job_res['data'][0]['urls'][0]
+
 
             # print(f'TTS file is available at: {tts_url}')
             return render_template('TTS.html', sound_url=tts_url, data=data, data_length=data_length,
@@ -775,8 +779,10 @@ def pdf_to_speech():
                 # print(page_obj.extractText())
                 t += page_obj.extractText()
             # Close the PDF file
+
             pdf_file.close()
-            return render_template('TTS.html', text=t)
+            return render_template('TTS.html', text=t, di=di)
+
         return flash('No file provided.')
     return render_template('TTS.html')
 
@@ -792,6 +798,7 @@ def pdf_to_speech():
     #     print(os.path.join(os.path.abspath(os.path.dirname("__file__"))))
     #     return "File has been Uploaded"
     # return render_template('pdf-to-speech.html', form=form)
+
 
 
 if __name__ == "__main__":

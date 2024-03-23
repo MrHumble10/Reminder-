@@ -17,6 +17,7 @@
     position:relative;
 }
 </style>
+
 <body>
         <div id="layoutError">
             <div id="layoutError_content">
@@ -36,17 +37,18 @@
                             <h6 class="mt-3 mx-3">You can extract text from PDF file.</h6>
                         <div style="display:flex; ">
 
-                            <form action="{{url_for('pdf_to_speech')}}" method="post" enctype="multipart/form-data" class="my-4 mx-4  ">
+                            <form action="/pdf-to-speech#Your" method="post" enctype="multipart/form-data" class="my-4 mx-4  ">
                                     <input class="mb-2" type="file" name="file" required multiple>
                                     <!-- Additional form elements can be added here -->
-                                    <input type="submit" value="Upload">
+                                <input type="submit" value="Upload" >
+
 
 
                                     </form>
                             </div>
                         </div>
 
-                            <form action="{{url_for('tts')}}" method="post" enctype="multipart/form-data">
+                            <form action="/text-to-speech#sound" method="post" enctype="multipart/form-data">
                                 <div class="row justify-content">
                                 <label for="exampleFormControlinput1" class="form-label py-3" style="resize: none;">Select a voice:</label>
                             {%for num in di%}
@@ -79,7 +81,7 @@
 
                         <div class="row justify-content-center">
                             <div class="mb-5">
-                                  <label for="pdfToSpeech" class="form-label py-3" style="resize: none;">Your Text:</label>
+                                  <label for="pdfToSpeech" class="form-label py-3" style="resize: none;" id="Your">Your Text:</label>
 
                                   <textarea name="textarea" class="form-control" id="pdfToSpeech" rows="6">{{text}}</textarea>
 
@@ -88,7 +90,7 @@
                             </div>
 
 <!--                            <embed src="{{sound_url}}" width="200" height="60" autostart="false" loop="true">-->
-                            <audio controls>
+                            <audio controls id="sound">
                               <source src="{{sound_url}}" />
                             </audio>
                         </div>
