@@ -658,35 +658,10 @@ def logout():
 def tts():
     if current_user.is_authenticated:
 
-        try:
-            os.mkdir(f"{os.path.join(os.path.abspath(os.path.dirname('__file__')))}/{app.config['UPLOAD_FILE']}")
-        except FileExistsError:
-            pass
-        t = ''
-        # related to file upload
-        if 'file' in request.files:
-            file = request.files['file']
-            if file:
-                file.save(
-                    os.path.join(os.path.abspath(os.path.dirname('__file__')), app.config['UPLOAD_FILE'],
-                                 secure_filename(file.filename)))
 
-                # Open the PDF file
-                pdf_file = open(f'./static/files/{file.filename}', 'rb')
 
-                # Create a PDF reader object
-                pdf_reader = PyPDF2.PdfFileReader(pdf_file)
 
-                # Get the number of pages in the PDF file
-                num_pages = pdf_reader.numPages
 
-                # Loop through all the pages and extract the text
-                for page in range(num_pages):
-                    page_obj = pdf_reader.getPage(page)
-                    # print(page_obj.extractText())
-                    t += page_obj.extractText()
-                # Close the PDF file
-                pdf_file.close()
 
         headers = {
             "accept": "application/json",
@@ -742,9 +717,9 @@ def tts():
 
             # print(f'TTS file is available at: {tts_url}')
             return render_template('TTS.html', sound_url=tts_url, data=data, data_length=data_length,
-                                   di=di, text=t)
+                                   di=di)
         return render_template('TTS.html', data=data, data_length=data_length, sound_url=sound_url,
-                               di=di, text=t)
+                               di=di)
     else:
         flash("login please")
         return redirect(url_for('login'))
@@ -760,13 +735,25 @@ def pdf_to_speech():
     if 'file' in request.files:
         file = request.files['file']
         if file:
+            # ---if we need to save every uploaded files we can save them by their actual name. here there is a problem
+            # if name of file is in latin it won't be saved in its actual name so that when it's going to be opened
+            # won't be founded ---
+
+            # file.save(
+            #     os.path.join(os.path.abspath(os.path.dirname('__file__')), app.config['UPLOAD_FILE'],
+            #                  secure_filename(file.filename)))
+            #
+            # # Open the PDF file
+            # pdf_file = open(f'./static/files/{file.filename}', mode='rb')
+
+
+            # ---if we need to save and work with just one uploaded file we can save that by a given name.---
             file.save(
                 os.path.join(os.path.abspath(os.path.dirname('__file__')), app.config['UPLOAD_FILE'],
-                             secure_filename(file.filename)))
+                             'x.pdf'))
 
             # Open the PDF file
-            pdf_file = open(f'./static/files/{file.filename}', 'rb')
-
+            pdf_file = open(f'./static/files/x.pdf', mode='rb')
             # Create a PDF reader object
             pdf_reader = PyPDF2.PdfFileReader(pdf_file)
 
