@@ -100,7 +100,7 @@ URL = "https://api.genny.lovo.ai"
 EMAIL_SENT_DATE = ''
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = '123456789'
 # os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///todos.db")
 app.config['UPLOAD_FILE'] = './static/files'
@@ -659,14 +659,10 @@ def tts():
     if current_user.is_authenticated:
 
 
-
-
-
-
         headers = {
             "accept": "application/json",
             "content-type": "application/json",
-            "X-API-KEY": os.environ.get('X-API-KEY')
+            "X-API-KEY": '7c8b99eb-415a-4eb6-a27a-9bf2f575f745'
             # "X-API-KEY": os.environ.get('X-API-KEY'),
         }
 

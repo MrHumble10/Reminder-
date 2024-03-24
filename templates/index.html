@@ -1,13 +1,46 @@
+<title>My Reminder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Rakkas&display=swap" rel="stylesheet">
 {%include 'header.html'%}
 <!--google fonts-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
 <style>
+
 .lilita-one-regular {
   font-family: "Lilita One", sans-serif;
   font-weight: 400;
   font-style: normal;
+}
+.rakkas-regular {
+  font-family: "Rakkas", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.libre-baskerville-regular {
+  font-family: "Libre Baskerville", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.libre-baskerville-bold {
+  font-family: "Libre Baskerville", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.libre-baskerville-regular-italic {
+  font-family: "Libre Baskerville", serif;
+  font-weight: 400;
+  font-style: italic;
 }
 
 </style>
@@ -16,9 +49,9 @@
 
 
     <div class="container-fluid px-4 ">
-        <h1 class="mt-4 ">{{datetime.now().strftime("%Y")}}</h1>
+        <h1 class="my-4 libre-baskerville-bold" style="color:#124076;">{{datetime.now().strftime("%Y")}}</h1>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item active">Your Schedule For This Month ({{datetime.now().strftime("%B")}})</li>
+            <li class="breadcrumb-item active libre-baskerville-bold">Your Schedule For This Month ({{datetime.now().strftime("%B")}})</li>
         </ol>
         <div class="container-fluid px-4">
             {% with messages = get_flashed_messages() %}
@@ -31,7 +64,7 @@
         </div>
         {%if  nothing_for_this_month%}
         <div class="lilita-one-regular">
-            <h1 class=" small" style="color:red; ">You don't have any plan for this month</h1>
+            <h1 class=" small libre-baskerville-bold" style="color:red; ">You don't have any plan for this month</h1>
         </div>
         {%endif%}
 
@@ -43,18 +76,28 @@
 
                     {%if date == today%}
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            <button class="accordion-button collapsed libre-baskerville-bold" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#collapseTodo{{date}}"
-                                    aria-expanded="false" aria-controls="collapseTodo{{date}}">
+                                    aria-expanded="false" aria-controls="collapseTodo{{date}}" style="color:#379956;" >
 
                                 Today
                             </button>
                         </h2>
+
+                    {%elif date < today%}
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed libre-baskerville-bold" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseTodo{{date}}"
+                                    aria-expanded="false" aria-controls="collapseTodo{{date}}" style="color:#CCD3CA;" >
+
+                                {{date}}
+                            </button>
+                        </h2>
                     {%else%}
                         <h2 class="accordion-header">
-                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                          <button class="accordion-button collapsed libre-baskerville-bold" type="button" data-bs-toggle="collapse"
                                   data-bs-target="#collapseTodo{{date}}" aria-expanded="false"
-                                  aria-controls="collapseTodo{{date}}">
+                                  aria-controls="collapseTodo{{date}}" style="color:#124076;">
                             {{date}}
                           </button>
                         </h2>

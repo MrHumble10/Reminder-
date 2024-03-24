@@ -10,7 +10,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>To-Do List</title>
+
+        <link rel="icon" type="image/x-icon" href="./static/icon.ico">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
@@ -19,14 +20,25 @@
         <!--google fonts-->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Bigshot+One&display=swap" rel="stylesheet">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Protest+Riot&display=swap" rel="stylesheet">
     </head>
+    <style>
+        .bigshot-one-regular {
+  font-family: "Bigshot One", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+    </style>
     <body class="sb-nav-fixed" style="background:#FDF4F5;">
 
 
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark" style="background:linear-gradient(to bottom, #38419D, #38419D, #24243e);">
             <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="{{url_for('home')}}">TO DO LIST</a>
+            <a class="navbar-brand ps-3 bigshot-one-regular" href="{{url_for('home')}}">TO DO LIST</a>
             <!-- Sidebar Toggle-->
             <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
 
@@ -70,6 +82,7 @@
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
                                     {%for year in years%}
+
                                     <a class="nav-link" href="{{url_for('years',year=year)}}">{{year}}</a>
                                     {%endfor%}
 
@@ -120,7 +133,7 @@
                     </div>
                     <div class="sb-sidenav-footer">
                         <div class="small">Logged in as:</div>
-                        Start Bootstrap
+                        {{current_user.email}}
                     </div>
                 </nav>
             </div>
